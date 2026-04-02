@@ -1,7 +1,9 @@
 # Chapter QA Lab 🧑🏼‍🔬
 
-Página criada para testes de deeplinkd contidos nesta página do Confluence 👉 <a href="https://petz.atlassian.net/wiki/spaces/TN/pages/edit-v2/2373746697">
+Ambiente dedicado para testes de deeplinks do app Petz.
 
+📚 Documentação e referência completa disponível no Confluence:  
+👉 [Acessar página](https://petz.atlassian.net/wiki/spaces/TN/pages/edit-v2/2373746697)
 ## Biblioteca para Teste de Deeplinks
 
 | Tipo | Android | iOS |
