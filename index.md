@@ -1,4 +1,4 @@
-# Chapter QA Lab
+# Chapter QA Lab 🧑🏼‍🔬
 
 Este é o site de Petz Chapter QA.
 
