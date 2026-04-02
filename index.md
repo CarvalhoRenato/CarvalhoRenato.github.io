@@ -1,6 +1,6 @@
 # Chapter QA Lab 🧑🏼‍🔬
 
-Este é o site de Petz Chapter QA.
+Página criada para testes de deeplinkd contidos nesta página do Confluence 👉 https://petz.atlassian.net/wiki/spaces/TN/pages/edit-v2/2373746697
 
 ## Biblioteca para Teste de Deeplinks
 
