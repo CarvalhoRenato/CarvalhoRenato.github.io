@@ -2,7 +2,7 @@
 
 Este é o site de Petz Chapter QA.
 
-## Biblioteca para Teste de Deeplinks
+## Biblioteca para Teste de Deeplinks - NEW
 
 | Tipo | Descrição | Ação |
 |------|-----------|------|
