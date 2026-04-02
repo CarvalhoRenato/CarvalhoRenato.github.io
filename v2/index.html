@@ -1,97 +1,131 @@
-<!DOCTYPE html>
+<div class="grid">
 
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QA Lab v2</title>
-
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-      background: #0f172a;
-      color: #e2e8f0;
-      padding: 24px;
-      margin: 0;
-    }
-
-    h1 {
-      margin-bottom: 8px;
-    }
-
-    p {
-      color: #94a3b8;
-    }
-
-    .grid {
-      display: grid;
-      gap: 16px;
-      margin-top: 24px;
-    }
-
-    .card {
-      background: #1e293b;
-      padding: 16px;
-      border-radius: 12px;
-    }
-
-    .title {
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    .buttons {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn {
-      padding: 8px 14px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 14px;
-    }
-
-    .android {
-      background: #DCFCE7;
-      color: #166534;
-    }
-
-    .ios {
-      background: #E2E8F0;
-      color: #334155;
-    }
-  </style>
-
-</head>
-
-<body>
-
-  <h1>Chapter QA Lab v2 🧪</h1>
-  <p>Nova versão da ferramenta de testes de deeplinks</p>
-
-  <div class="grid">
-
-```
-<div class="card">
-  <div class="title">Produto</div>
-  <div class="buttons">
-    <a class="btn android" href="petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767">Android</a>
-    <a class="btn ios" href="petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2">iOS</a>
+  <div class="card">
+    <div class="title">Produto</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767">Android</a>
+      <a class="btn ios" href="petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2">iOS</a>
+    </div>
   </div>
+
+  <div class="card">
+    <div class="title">WebView</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://webview/<url_produto_web>">Android</a>
+      <a class="btn ios" href="petz://webview/https://www.petz.com.br/produto/areia-higienica-fresh-micro-silica-cristal-para-gatos-1-6-kg-181825">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Coleção / Categoria</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://colecao/EG-selecao-marca-propria-petz">Android</a>
+      <a class="btn ios" href="petz://colecao/EG-selecao-marca-propria-petz&action_type=3">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Assinatura / Edição</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://pag_assinaturas">Android</a>
+      <a class="btn ios" href="petz://pag_assinaturas&action_type=4">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Lojas</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://pag_lojas">Android</a>
+      <a class="btn ios" href="petz://pag_lojas&action_type=5">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Ofertas</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://minhas_ofertas">Android</a>
+      <a class="btn ios" href="petz://minhas_ofertas&action_type=6">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Banho & Tosa</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://banho_tosa">Android</a>
+      <a class="btn ios" href="petz://banho_tosa&action_type=7">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Meus Pets</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://meus_pets">Android</a>
+      <a class="btn ios" href="petz://meus_pets">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Seres</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://seres">Android</a>
+      <a class="btn ios" href="petz://seres">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Feed Petz</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://feed_petz">Android</a>
+      <a class="btn ios" href="petz://feed_petz">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Carteira</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://carteira">Android</a>
+      <a class="btn ios" href="petz://carteira&action_type=11">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Blog Petz</div>
+    <div class="buttons">
+      <a class="btn android" href="blog_petz">Android</a>
+      <a class="btn ios" href="petz://webview/https://www.petz.com.br/blog/">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Home Clubz</div>
+    <div class="buttons">
+      <a class="btn android" href="clubz_home">Android</a>
+      <a class="btn ios" href="petz://clubz_home">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Cupons</div>
+    <div class="buttons">
+      <a class="btn android" href="cupons">Android</a>
+      <a class="btn ios" href="petz://cupons">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Plano de Saúde</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://healthcare">Android</a>
+      <a class="btn ios" href="petz://healthcare">iOS</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title">Home</div>
+    <div class="buttons">
+      <a class="btn android" href="petz://home">Android</a>
+      <a class="btn ios" href="petz://home">iOS</a>
+    </div>
+  </div>
+
 </div>
-
-<div class="card">
-  <div class="title">Coleção</div>
-  <div class="buttons">
-    <a class="btn android" href="petz://colecao/EG-selecao-marca-propria-petz">Android</a>
-    <a class="btn ios" href="petz://colecao/EG-selecao-marca-propria-petz&action_type=3">iOS</a>
-  </div>
-</div>
-```
-
-  </div>
-
-</body>
-</html>
