@@ -22,3 +22,6 @@ Este é o site de Petz Chapter QA.
 | Cupons | [Abrir](cupons) | [Abrir](petz://cupons) |
 | Plano de Saúde | [Abrir](petz://healthcare) | [Abrir](petz://healthcare) |
 | Home | [Abrir](petz://home) | [Abrir](petz://home) |
+| Test Button | 
+<a href="petz://colecao/EG-selecao-marca-propria-petz" style="padding:6px 12px; background:#22c55e; color:#000; border-radius:6px; text-decoration:none;">Abrir</a> |
+<a href="petz://colecao/EG-selecao-marca-propria-petz&action_type=3" style="padding:6px 12px; background:#3b82f6; color:#000; border-radius:6px; text-decoration:none;">Abrir</a> |
