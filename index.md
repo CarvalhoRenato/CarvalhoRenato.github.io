@@ -12,7 +12,7 @@ Este é o site de Petz Chapter QA.
 | Assinatura/Edição | Assinaturas Petz New| [Abrir Deeplink](petz://pag_assinaturas&action_type=4) |
 | Lojas | Localizador de Lojas | [Abrir Deeplink](petz://pag_lojas&action_type=5) |
 | Ofertas | Minhas Ofertas | [Abrir Deeplink](petz://minhas_ofertas&action_type=6) |
-| Serviços | Banho e Tosa New | [Abrir Deeplink](petz://banho_tosa&action_type=7.) |
+| Serviços | Banho e Tosa TOKEN | [Abrir Deeplink](petz://banho_tosa) |
 | Perfil | Meus Pets | [Abrir Deeplink](petz://meus_pets) |
 | Comunidade | Seres | [Abrir Deeplink](petz://seres) |
 | Feed | Feed Petz | [Abrir Deeplink](petz://feed_petz) |
