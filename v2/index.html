@@ -51,6 +51,7 @@ body {
   padding: 14px;
   border-radius: 14px;
   border: 1px solid #E2E8F0;
+  font-size: 16px;
 }
 
 /* GRID */
@@ -201,6 +202,7 @@ body {
 <div class="watermark">Desenvolvido por Chapter QA</div>
 
 <script>
+
 // NAV
 function showPage(page) {
   document.getElementById('home-page').style.display = page === 'home' ? 'block' : 'none';
@@ -219,13 +221,13 @@ function showPage(page) {
 }
 
 // ========================
-// DEEPLINKS
+// DEEPLINKS (BASE ORIGINAL)
 // ========================
 const deeplinks = [
-  { title: "Produto", android: "petz://produto", ios: "petz://produto" },
-  { title: "WebView", android: "petz://webview", ios: "petz://webview" },
-  { title: "Coleção", android: "petz://colecao", ios: "petz://colecao" },
-  { title: "Assinatura", android: "petz://assinatura", ios: "petz://assinatura" }
+  { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
+  { title: "WebView", android: "petz://webview/<url_produto_web>", ios: "petz://webview/https://www.petz.com.br/produto/areia-higienica-fresh-micro-silica-cristal-para-gatos-1-6-kg-181825" },
+  { title: "Coleção / Categoria", android: "petz://colecao/EG-selecao-marca-propria-petz", ios: "petz://colecao/EG-selecao-marca-propria-petz&action_type=3" },
+  { title: "Assinatura / Edição", android: "petz://pag_assinaturas", ios: "petz://pag_assinaturas&action_type=4" }
 ];
 
 const grid = document.getElementById("grid");
@@ -256,7 +258,7 @@ document.getElementById("search").addEventListener("input", function () {
 });
 
 // ========================
-// HEALTH
+// HEALTH (BASE ORIGINAL)
 // ========================
 const environments = [
   {
