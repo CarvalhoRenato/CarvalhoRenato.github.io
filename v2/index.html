@@ -314,19 +314,52 @@ async function loadHealth() {
     const card = document.createElement("div");
     card.className = "card";
 
-    const header = document.createElement("div");
-    header.className = "toggle";
+   const header = document.createElement("div");
+header.className = "toggle";
 
-    const title = document.createElement("div");
-    title.className = "title";
-    title.innerText = env.name;
+const left = document.createElement("div");
+left.style.display = "flex";
+left.style.alignItems = "center";
+left.style.gap = "8px";
 
-    const arrow = document.createElement("div");
-    arrow.className = "arrow";
-    arrow.innerText = "▶";
+const right = document.createElement("div");
+right.style.display = "flex";
+right.style.alignItems = "center";
+right.style.gap = "16px"; // 👈 espaço seguro
 
-    header.appendChild(title);
-    header.appendChild(arrow);
+const title = document.createElement("div");
+title.className = "title";
+title.innerText = env.name;
+
+const arrow = document.createElement("div");
+arrow.className = "arrow";
+arrow.innerText = "▶";
+
+const reportBtn = document.createElement("button");
+reportBtn.innerText = "Reportar";
+
+// estilo inline (não mexe no CSS global)
+reportBtn.style.fontSize = "12px";
+reportBtn.style.padding = "6px 12px";
+reportBtn.style.borderRadius = "10px";
+reportBtn.style.border = "1px solid #FCA5A5";
+reportBtn.style.background = "#FEF2F2";
+reportBtn.style.color = "#B91C1C";
+reportBtn.style.cursor = "pointer";
+
+// 👉 impede clique de expandir quando clicar no botão
+reportBtn.onclick = (e) => {
+  e.stopPropagation();
+  alert("Reportar incidente (futuro Jira/Teams)");
+};
+
+left.appendChild(title);
+
+right.appendChild(reportBtn);
+right.appendChild(arrow);
+
+header.appendChild(left);
+header.appendChild(right);
 
     const servicesContainer = document.createElement("div");
     servicesContainer.className = "services";
