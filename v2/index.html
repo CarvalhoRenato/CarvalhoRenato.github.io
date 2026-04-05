@@ -40,24 +40,17 @@ body {
   color: #0369A1;
 }
 
-/* SEARCH */
-.search {
-  position: relative;
+.badge {
+  margin-left: 6px;
 }
 
+/* SEARCH */
 .search input {
   width: 100%;
-  padding: 14px 14px 14px 38px;
+  box-sizing: border-box;
+  padding: 14px;
   border-radius: 14px;
   border: 1px solid #E2E8F0;
-  font-size: 16px;
-}
-
-.search-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 /* GRID */
@@ -92,6 +85,9 @@ body {
   border-radius: 12px;
   text-align: center;
   text-decoration: none;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
 }
 
 .android {
@@ -104,41 +100,24 @@ body {
   color: #334155;
 }
 
-/* REPORT */
-.report-btn {
-  font-size: 12px;
-  padding: 6px 12px;
-  border-radius: 10px;
-  border: 1px solid #FCA5A5;
-  background: #FEF2F2;
-  color: #B91C1C;
-  cursor: pointer;
-}
-
 /* HEALTH */
 .toggle {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-}
-
-.header-left {
-  display: flex;
-  gap: 8px;
-}
-
-.header-right {
-  display: flex;
-  gap: 16px;
-  align-items: center;
+  cursor: pointer;
 }
 
 .arrow {
-  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.arrow.open {
+  transform: rotate(90deg);
 }
 
 .services {
   display: none;
+  margin-top: 10px;
 }
 
 .services.open {
@@ -167,104 +146,221 @@ body {
 
 <div class="container">
 
-<div class="menu">
-<button class="menu-item active" onclick="showPage('home')">Home</button>
-<button class="menu-item" onclick="showPage('deeplinks')">Deeplinks</button>
-<button class="menu-item" onclick="showPage('health')">Health</button>
-</div>
+  <!-- MENU -->
+  <div class="menu">
+    <button class="menu-item active" onclick="showPage('home')">Home</button>
+    <button class="menu-item" onclick="showPage('deeplinks')">Deeplinks</button>
+    <button class="menu-item" onclick="showPage('health')">
+      Health <span id="health-badge" class="badge"></span>
+    </button>
+  </div>
 
-<div id="home-page">
-<h1>QA Portal 🧪</h1>
-<div class="grid">
-<div class="card">
-<div class="title">🔗 Deeplinks</div>
-<button class="btn ios" onclick="showPage('deeplinks')">Acessar</button>
-</div>
-<div class="card">
-<div class="title">🚦 Health</div>
-<button class="btn android" onclick="showPage('health')">Ver status</button>
-</div>
-</div>
-</div>
+  <!-- HOME -->
+  <div id="home-page">
+    <h1>QA Portal 🧪</h1>
+    <p style="color:#64748B;">
+      Central de testes e validação de ambientes
+    </p>
 
-<div id="deeplinks-page" style="display:none;">
-<h1>Deeplinks</h1>
-<div class="search">
-<span class="search-icon">🔍</span>
-<input id="search" placeholder="Buscar..." />
-</div>
-<div class="grid" id="grid"></div>
-</div>
+    <div class="grid">
+      <div class="card">
+        <div class="title">🔗 Deeplinks</div>
+        <div class="buttons">
+          <button class="btn ios" onclick="showPage('deeplinks')">Acessar</button>
+        </div>
+      </div>
 
-<div id="health-page" style="display:none;">
-<h1>Health 🚦</h1>
-<div class="grid" id="health-grid"></div>
-</div>
+      <div class="card">
+        <div class="title">🚦 Health</div>
+        <div class="buttons">
+          <button class="btn android" onclick="showPage('health')">Ver status</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEEPLINKS -->
+  <div id="deeplinks-page" style="display:none;">
+    <h1>Deeplinks</h1>
+
+    <div class="search">
+      <input id="search" placeholder="Buscar..." />
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- HEALTH -->
+  <div id="health-page" style="display:none;">
+    <h1>Health 🚦</h1>
+    <div class="grid" id="health-grid"></div>
+  </div>
 
 </div>
 
 <div class="watermark">Desenvolvido por Chapter QA</div>
 
 <script>
-
 // NAV
 function showPage(page) {
   document.getElementById('home-page').style.display = page === 'home' ? 'block' : 'none';
   document.getElementById('deeplinks-page').style.display = page === 'deeplinks' ? 'block' : 'none';
   document.getElementById('health-page').style.display = page === 'health' ? 'block' : 'none';
+
+  document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
+
+  if (page === 'home') document.querySelectorAll('.menu-item')[0].classList.add('active');
+  if (page === 'deeplinks') document.querySelectorAll('.menu-item')[1].classList.add('active');
+
+  if (page === 'health') {
+    document.querySelectorAll('.menu-item')[2].classList.add('active');
+    loadHealth();
+  }
 }
 
 // ========================
-// DEEPLINKS (NÃO ALTERAR)
+// DEEPLINKS
 // ========================
 const deeplinks = [
-  { title: "Produto", android: "#", ios: "#" },
-  { title: "WebView", android: "#", ios: "#" },
-  { title: "Coleção", android: "#", ios: "#" },
-  { title: "Assinatura", android: "#", ios: "#" }
+  { title: "Produto", android: "petz://produto", ios: "petz://produto" },
+  { title: "WebView", android: "petz://webview", ios: "petz://webview" },
+  { title: "Coleção", android: "petz://colecao", ios: "petz://colecao" },
+  { title: "Assinatura", android: "petz://assinatura", ios: "petz://assinatura" }
 ];
 
+const grid = document.getElementById("grid");
+
 function render(list) {
-  const grid = document.getElementById("grid");
   grid.innerHTML = "";
   list.forEach(item => {
-    grid.innerHTML += `
-      <div class="card">
-        <div class="title">${item.title}</div>
-        <div class="buttons">
-          <a class="btn android">Android</a>
-          <a class="btn ios">iOS</a>
-        </div>
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="title">${item.title}</div>
+      <div class="buttons">
+        <a class="btn android" href="${item.android}">Android</a>
+        <a class="btn ios" href="${item.ios}">iOS</a>
       </div>
     `;
+    grid.appendChild(card);
   });
 }
 
 render(deeplinks);
 
+document.getElementById("search").addEventListener("input", function () {
+  const value = this.value.toLowerCase();
+  render(deeplinks.filter(item =>
+    item.title.toLowerCase().includes(value)
+  ));
+});
+
 // ========================
 // HEALTH
 // ========================
-function loadHealth() {
-  const grid = document.getElementById("health-grid");
-  grid.innerHTML = `
-    <div class="card">
-      <div class="toggle">
-        <div class="header-left">PRD 🟡</div>
-        <div class="header-right">
-          <button class="report-btn">Reportar</button>
-          <div class="arrow">▶</div>
-        </div>
-      </div>
-      <div class="services open">
-        <div class="service">Home API <span>🟢</span></div>
-        <div class="service">Fake OK <span>🟢</span></div>
-        <div class="service">Fake FAIL <span>⚠️</span></div>
-      </div>
-    </div>
-  `;
-}
+const environments = [
+  {
+    name: "PRD",
+    services: [
+      { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" },
+      { name: "Fake OK", url: "https://www.petz.com.br/home/api/readiness" },
+      { name: "Fake FAIL", url: "https://fake-url/test" }
+    ]
+  }
+];
 
+async function loadHealth() {
+
+  const grid = document.getElementById("health-grid");
+  const badge = document.getElementById("health-badge");
+
+  grid.innerHTML = "";
+
+  let globalFailed = 0;
+  let globalTotal = 0;
+
+  for (const env of environments) {
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const header = document.createElement("div");
+    header.className = "toggle";
+
+    const title = document.createElement("div");
+    title.className = "title";
+    title.innerText = env.name;
+
+    const arrow = document.createElement("div");
+    arrow.className = "arrow";
+    arrow.innerText = "▶";
+
+    header.appendChild(title);
+    header.appendChild(arrow);
+
+    const servicesContainer = document.createElement("div");
+    servicesContainer.className = "services";
+
+    card.appendChild(header);
+    card.appendChild(servicesContainer);
+    grid.appendChild(card);
+
+    header.onclick = () => {
+      servicesContainer.classList.toggle("open");
+      arrow.classList.toggle("open");
+    };
+
+    let failed = 0;
+
+    for (const service of env.services) {
+
+      globalTotal++;
+
+      const el = document.createElement("div");
+      el.className = "service";
+      el.innerHTML = `<span>${service.name}</span><span>🔄</span>`;
+      servicesContainer.appendChild(el);
+
+      try {
+        const res = await fetch("https://corsproxy.io/?"+encodeURIComponent(service.url));
+        const data = await res.json();
+
+        const ok = data.checked === "ready";
+
+        if (!ok) {
+          failed++;
+          globalFailed++;
+        }
+
+        el.innerHTML = `
+          <span>${service.name}</span>
+          <span>${ok ? "🟢" : "🔴"}</span>
+        `;
+
+      } catch {
+        failed++;
+        globalFailed++;
+
+        el.innerHTML = `
+          <span>${service.name}</span>
+          <span>⚠️</span>
+        `;
+      }
+    }
+
+    let status = document.createElement("span");
+
+    if (failed === 0) status.innerText = " 🟢";
+    else if (failed < env.services.length) status.innerText = " 🟡";
+    else status.innerText = " 🔴";
+
+    title.appendChild(status);
+  }
+
+  if (globalFailed === 0) badge.innerText = "🟢";
+  else if (globalFailed < globalTotal) badge.innerText = "🟡";
+  else badge.innerText = "🔴";
+}
 </script>
 
 </body>
