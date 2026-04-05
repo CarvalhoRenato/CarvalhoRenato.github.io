@@ -34,17 +34,16 @@ body {
   border: 1px solid #E2E8F0;
   background: #FFFFFF;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
-}
-
-.menu-item:active {
-  transform: scale(0.92);
 }
 
 .menu-item.active {
   background: #E0F2FE;
   border-color: #38BDF8;
   color: #0369A1;
+}
+
+.badge {
+  margin-left: 6px;
 }
 
 /* ========================
@@ -61,14 +60,6 @@ body {
   border-radius: 14px;
   border: 1px solid #E2E8F0;
   font-size: 16px;
-  transition: all 0.2s ease;
-}
-
-.search input:focus {
-  border-color: #38BDF8;
-  box-shadow: 0 0 0 3px rgba(56,189,248,0.25);
-  transform: scale(1.02);
-  outline: none;
 }
 
 .search-icon {
@@ -80,6 +71,15 @@ body {
 }
 
 /* ========================
+   GRID
+======================== */
+.grid {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+/* ========================
    CARD
 ======================== */
 .card {
@@ -87,16 +87,10 @@ body {
   padding: 18px;
   border-radius: 16px;
   border: 1px solid #E2E8F0;
-  transition: transform 0.2s ease, box-shadow 0.25s ease;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
-}
-
-.card:active {
-  transform: scale(0.97);
+.title {
+  font-weight: 600;
 }
 
 /* ========================
@@ -115,15 +109,6 @@ body {
   text-align: center;
   text-decoration: none;
   font-weight: 500;
-  transition: transform 0.1s ease, box-shadow 0.2s ease;
-}
-
-.btn:active {
-  transform: scale(0.92);
-}
-
-.btn:hover {
-  box-shadow: 0 6px 14px rgba(0,0,0,0.1);
 }
 
 .android {
@@ -137,15 +122,6 @@ body {
 }
 
 /* ========================
-   GRID
-======================== */
-.grid {
-  display: grid;
-  gap: 16px;
-  margin-top: 20px;
-}
-
-/* ========================
    HEALTH
 ======================== */
 .toggle {
@@ -155,7 +131,7 @@ body {
 }
 
 .arrow {
-  transition: transform 0.25s ease;
+  transition: transform 0.2s;
 }
 
 .arrow.open {
@@ -175,21 +151,6 @@ body {
   display: flex;
   justify-content: space-between;
   margin-top: 8px;
-  animation: fadeIn 0.3s ease;
-}
-
-/* ========================
-   ANIMAÇÃO
-======================== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* ========================
@@ -215,13 +176,16 @@ body {
     <button class="menu-item active" onclick="showPage('home')">Home</button>
     <button class="menu-item" onclick="showPage('deeplinks')">Deeplinks</button>
     <button class="menu-item" onclick="showPage('health')">
-      Health <span id="health-badge"></span>
+      Health <span id="health-badge" class="badge"></span>
     </button>
   </div>
 
   <!-- HOME -->
   <div id="home-page">
     <h1>QA Portal 🧪</h1>
+    <p style="color:#64748B;">
+      Central de testes e validação de ambientes
+    </p>
 
     <div class="grid">
       <div class="card">
@@ -284,7 +248,7 @@ function showPage(page) {
 }
 
 // ========================
-// DEEPLINKS (COMPLETO)
+// DEEPLINKS
 // ========================
 const deeplinks = [
   { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
@@ -333,7 +297,7 @@ document.getElementById("search").addEventListener("input", function () {
 });
 
 // ========================
-// HEALTH (INALTERADO)
+// HEALTH (COMPLETO)
 // ========================
 const environments = [
   {
@@ -346,7 +310,98 @@ const environments = [
   }
 ];
 
-// (resto igual ao seu código atual)
+async function loadHealth() {
+  const grid = document.getElementById("health-grid");
+  const badge = document.getElementById("health-badge");
+
+  grid.innerHTML = "";
+
+  let globalFailed = 0;
+  let globalTotal = 0;
+
+  for (const env of environments) {
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const header = document.createElement("div");
+    header.className = "toggle";
+
+    const title = document.createElement("div");
+    title.className = "title";
+    title.innerText = env.name;
+
+    const arrow = document.createElement("div");
+    arrow.className = "arrow";
+    arrow.innerText = "▶";
+
+    header.appendChild(title);
+    header.appendChild(arrow);
+
+    const servicesContainer = document.createElement("div");
+    servicesContainer.className = "services";
+
+    card.appendChild(header);
+    card.appendChild(servicesContainer);
+    grid.appendChild(card);
+
+    header.onclick = () => {
+      servicesContainer.classList.toggle("open");
+      arrow.classList.toggle("open");
+    };
+
+    let failed = 0;
+
+    for (const service of env.services) {
+
+      globalTotal++;
+
+      const el = document.createElement("div");
+      el.className = "service";
+      el.innerHTML = `<span>${service.name}</span><span>🔄</span>`;
+      servicesContainer.appendChild(el);
+
+      try {
+        const res = await fetch("https://corsproxy.io/?"+encodeURIComponent(service.url));
+        const data = await res.json();
+
+        const ok = data.checked === "ready";
+
+        if (!ok) {
+          failed++;
+          globalFailed++;
+        }
+
+        el.innerHTML = `
+          <span>${service.name}</span>
+          <span>${ok ? "🟢" : "🔴"}</span>
+        `;
+
+      } catch {
+        failed++;
+        globalFailed++;
+
+        el.innerHTML = `
+          <span>${service.name}</span>
+          <span>⚠️</span>
+        `;
+      }
+    }
+
+    let status = document.createElement("span");
+
+    if (failed === 0) status.innerText = " 🟢";
+    else if (failed < env.services.length) status.innerText = " 🟡";
+    else status.innerText = " 🔴";
+
+    title.appendChild(status);
+  }
+
+  if (globalFailed === 0) badge.innerText = "🟢";
+  else if (globalFailed < globalTotal) badge.innerText = "🟡";
+  else badge.innerText = "🔴";
+}
+
 </script>
 
 </body>
