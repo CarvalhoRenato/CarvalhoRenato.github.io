@@ -1,155 +1,86 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QA Portal</title>
-
-<style>
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-  background: #F8FAFC;
-  color: #0F172A;
-  padding: 16px;
-  margin: 0;
-}
-
-.container {
-  max-width: 640px;
-  margin: 0 auto;
-}
-
-/* MENU */
-.menu {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.menu-item {
-  padding: 8px 14px;
-  border-radius: 10px;
-  border: 1px solid #E2E8F0;
-  background: #FFFFFF;
-  cursor: pointer;
-}
-
-.menu-item.active {
-  background: #E0F2FE;
-  border-color: #38BDF8;
-  color: #0369A1;
-}
-
-/* SEARCH */
-.search {
-  margin-top: 16px;
-}
-
-.search input {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px solid #E2E8F0;
-  box-sizing: border-box;
-}
-
-/* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  margin-top: 20px;
-}
-
-/* CARD */
-.card {
-  background: #FFFFFF;
-  padding: 18px;
-  border-radius: 16px;
-  border: 1px solid #E2E8F0;
-}
-
-.title {
-  font-weight: 600;
-  margin-bottom: 14px;
-}
-
-/* BUTTONS */
-.buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.btn {
-  flex: 1;
-  padding: 12px;
-  border-radius: 12px;
-  text-align: center;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.android {
-  background: #DCFCE7;
-  color: #166534;
-}
-
-.ios {
-  background: #F1F5F9;
-  color: #334155;
-}
-
-.btn:active {
-  transform: scale(0.97);
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-  <!-- MENU -->
-  <div class="menu">
-    <button class="menu-item active" onclick="showPage('deeplinks')">Deeplinks</button>
-    <button class="menu-item" onclick="showPage('health')">Health</button>
-  </div>
-
-  <!-- DEEPLINKS -->
-  <div id="deeplinks-page">
-
-    <h1>Deeplinks</h1>
-
-    <div class="search">
-      <input id="search" placeholder="Buscar fluxo, tela ou deeplink..." />
-    </div>
-
-    <div class="grid" id="grid"></div>
-
-  </div>
-
-  <!-- HEALTH -->
-  <div id="health-page" style="display:none;">
-
-    <h1>Health 🚦</h1>
-
-    <div class="card">
-      <div class="title">STAGING</div>
-      <div>🟢 API Gateway</div>
-      <div>🟢 Auth</div>
-      <div>🔴 Checkout</div>
-      <div style="margin-top:10px; color:#DC2626; font-weight:600;">
-        Testes bloqueados
-      </div>
-    </div>
-
-  </div>
-
-</div>
-
 <script>
 // ========================
-// NAVIGATION
+// CONFIG (ambientes)
+// ========================
+const environments = [
+  {
+    name: "PRD",
+    readiness: "https://www.petz.com.br/home/api/readiness",
+    version: "https://www.petz.com.br/home/version.json"
+  },
+  {
+    name: "STG",
+    readiness: "URL_STG_AQUI",
+    version: "URL_STG_VERSION"
+  },
+  {
+    name: "DEV",
+    readiness: "URL_DEV_AQUI",
+    version: "URL_DEV_VERSION"
+  }
+];
+
+// ========================
+// LOAD HEALTH
+// ========================
+async function loadHealth() {
+  const grid = document.getElementById("health-grid");
+  grid.innerHTML = "";
+
+  for (const env of environments) {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <div class="title">${env.name}</div>
+      <div>🔄 Verificando...</div>
+    `;
+
+    grid.appendChild(card);
+
+    try {
+      const [readinessRes, versionRes] = await Promise.all([
+        fetch(env.readiness),
+        fetch(env.version)
+      ]);
+
+      const readiness = await readinessRes.json();
+      const version = await versionRes.json();
+
+      let statusHTML = "";
+      let decisionHTML = "";
+
+      if (readiness.checked === "ready") {
+        statusHTML = "🟢 Ambiente pronto";
+        decisionHTML = `<div style="color:#16A34A; font-weight:600;">✔️ Testes liberados</div>`;
+      } else {
+        statusHTML = "🔴 Ambiente não pronto";
+        decisionHTML = `<div style="color:#DC2626; font-weight:600;">❌ Testes bloqueados</div>`;
+      }
+
+      card.innerHTML = `
+        <div class="title">${env.name}</div>
+        <div>${statusHTML}</div>
+        <div style="margin-top:8px; font-size:14px; color:#64748B;">
+          Versão: ${readiness.version || "-"} <br>
+          Ambiente: ${readiness.env || "-"} <br>
+          Último deploy: ${version.updatedAt || "-"}
+        </div>
+        ${decisionHTML}
+      `;
+
+    } catch (error) {
+      card.innerHTML = `
+        <div class="title">${env.name}</div>
+        <div>⚠️ Erro ao verificar</div>
+        <div style="color:#DC2626; font-weight:600;">❌ Indisponível</div>
+      `;
+    }
+  }
+}
+
+// ========================
+// NAV (override)
 // ========================
 function showPage(page) {
   document.getElementById('deeplinks-page').style.display =
@@ -160,74 +91,13 @@ function showPage(page) {
 
   document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
 
-  if (page === 'deeplinks') document.querySelectorAll('.menu-item')[0].classList.add('active');
-  if (page === 'health') document.querySelectorAll('.menu-item')[1].classList.add('active');
+  if (page === 'deeplinks') {
+    document.querySelectorAll('.menu-item')[0].classList.add('active');
+  }
+
+  if (page === 'health') {
+    document.querySelectorAll('.menu-item')[1].classList.add('active');
+    loadHealth(); // 🔥 aqui entra tudo
+  }
 }
-
-// ========================
-// DATA (DEEPLINKS)
-// ========================
-const deeplinks = [
-  { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
-  { title: "WebView", android: "petz://webview/<url_produto_web>", ios: "petz://webview/https://www.petz.com.br/produto/areia-higienica-fresh-micro-silica-cristal-para-gatos-1-6-kg-181825" },
-  { title: "Coleção / Categoria", android: "petz://colecao/EG-selecao-marca-propria-petz", ios: "petz://colecao/EG-selecao-marca-propria-petz&action_type=3" },
-  { title: "Assinatura / Edição", android: "petz://pag_assinaturas", ios: "petz://pag_assinaturas&action_type=4" },
-  { title: "Lojas", android: "petz://pag_lojas", ios: "petz://pag_lojas&action_type=5" },
-  { title: "Ofertas", android: "petz://minhas_ofertas", ios: "petz://minhas_ofertas&action_type=6" },
-  { title: "Banho & Tosa", android: "petz://banho_tosa", ios: "petz://banho_tosa&action_type=7" },
-  { title: "Meus Pets", android: "petz://meus_pets", ios: "petz://meus_pets" },
-  { title: "Seres", android: "petz://seres", ios: "petz://seres" },
-  { title: "Feed Petz", android: "petz://feed_petz", ios: "petz://feed_petz" },
-  { title: "Carteira", android: "petz://carteira", ios: "petz://carteira&action_type=11" },
-  { title: "Blog Petz", android: "blog_petz", ios: "petz://webview/https://www.petz.com.br/blog/" },
-  { title: "Home Clubz", android: "clubz_home", ios: "petz://clubz_home" },
-  { title: "Cupons", android: "cupons", ios: "petz://cupons" },
-  { title: "Plano de Saúde", android: "petz://healthcare", ios: "petz://healthcare" },
-  { title: "Home", android: "petz://home", ios: "petz://home" }
-];
-
-// ========================
-// RENDER
-// ========================
-const grid = document.getElementById("grid");
-
-function render(list) {
-  grid.innerHTML = "";
-
-  list.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <div class="title">${item.title}</div>
-      <div class="buttons">
-        <a class="btn android" href="${item.android}">Android</a>
-        <a class="btn ios" href="${item.ios}">iOS</a>
-      </div>
-    `;
-
-    grid.appendChild(card);
-  });
-}
-
-// inicial
-render(deeplinks);
-
-// ========================
-// SEARCH
-// ========================
-document.getElementById("search").addEventListener("input", function () {
-  const value = this.value.toLowerCase();
-
-  const filtered = deeplinks.filter(item =>
-    item.title.toLowerCase().includes(value) ||
-    item.android.toLowerCase().includes(value) ||
-    item.ios.toLowerCase().includes(value)
-  );
-
-  render(filtered);
-});
 </script>
-
-</body>
-</html>
