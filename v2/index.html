@@ -31,6 +31,7 @@ body {
   border: 1px solid #E2E8F0;
   background: #FFFFFF;
   cursor: pointer;
+  position: relative;
 }
 
 .menu-item.active {
@@ -39,6 +40,13 @@ body {
   color: #0369A1;
 }
 
+/* BADGE */
+.badge {
+  margin-left: 6px;
+  font-weight: 600;
+}
+
+/* RESTO */
 .search input {
   width: 100%;
   padding: 14px;
@@ -93,11 +101,10 @@ body {
   cursor: pointer;
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
 
 .arrow {
-  transition: transform 0.2s ease;
+  transition: transform 0.2s;
 }
 
 .arrow.open {
@@ -105,8 +112,8 @@ body {
 }
 
 .services {
-  margin-top: 10px;
   display: none;
+  margin-top: 10px;
 }
 
 .services.open {
@@ -117,12 +124,11 @@ body {
   display: flex;
   justify-content: space-between;
   margin-top: 8px;
-  font-size: 14px;
 }
 
 .status-ok { color: #16A34A; }
-.status-bad { color: #DC2626; }
 .status-warn { color: #D97706; }
+.status-bad { color: #DC2626; }
 </style>
 </head>
 
@@ -130,9 +136,12 @@ body {
 
 <div class="container">
 
+  <!-- MENU -->
   <div class="menu">
     <button class="menu-item active" onclick="showPage('deeplinks')">Deeplinks</button>
-    <button class="menu-item" onclick="showPage('health')">Health</button>
+    <button class="menu-item" onclick="showPage('health')">
+      Health <span id="health-badge" class="badge"></span>
+    </button>
   </div>
 
   <!-- DEEPLINKS -->
@@ -177,22 +186,7 @@ function showPage(page) {
 // DEEPLINKS
 // ========================
 const deeplinks = [
-  { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
-  { title: "WebView", android: "petz://webview/<url_produto_web>", ios: "petz://webview/https://www.petz.com.br/produto/areia-higienica-fresh-micro-silica-cristal-para-gatos-1-6-kg-181825" },
-  { title: "Coleção / Categoria", android: "petz://colecao/EG-selecao-marca-propria-petz", ios: "petz://colecao/EG-selecao-marca-propria-petz&action_type=3" },
-  { title: "Assinatura / Edição", android: "petz://pag_assinaturas", ios: "petz://pag_assinaturas&action_type=4" },
-  { title: "Lojas", android: "petz://pag_lojas", ios: "petz://pag_lojas&action_type=5" },
-  { title: "Ofertas", android: "petz://minhas_ofertas", ios: "petz://minhas_ofertas&action_type=6" },
-  { title: "Banho & Tosa", android: "petz://banho_tosa", ios: "petz://banho_tosa&action_type=7" },
-  { title: "Meus Pets", android: "petz://meus_pets", ios: "petz://meus_pets" },
-  { title: "Seres", android: "petz://seres", ios: "petz://seres" },
-  { title: "Feed Petz", android: "petz://feed_petz", ios: "petz://feed_petz" },
-  { title: "Carteira", android: "petz://carteira", ios: "petz://carteira&action_type=11" },
-  { title: "Blog Petz", android: "blog_petz", ios: "petz://webview/https://www.petz.com.br/blog/" },
-  { title: "Home Clubz", android: "clubz_home", ios: "petz://clubz_home" },
-  { title: "Cupons", android: "cupons", ios: "petz://cupons" },
-  { title: "Plano de Saúde", android: "petz://healthcare", ios: "petz://healthcare" },
-  { title: "Home", android: "petz://home", ios: "petz://home" }
+  { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" }
 ];
 
 const grid = document.getElementById("grid");
@@ -215,16 +209,8 @@ function render(list) {
 
 render(deeplinks);
 
-// SEARCH
-document.getElementById("search").addEventListener("input", function () {
-  const value = this.value.toLowerCase();
-  render(deeplinks.filter(item =>
-    item.title.toLowerCase().includes(value)
-  ));
-});
-
 // ========================
-// HEALTH (INTELIGENTE)
+// HEALTH CONFIG
 // ========================
 const environments = [
   {
@@ -232,15 +218,22 @@ const environments = [
     services: [
       { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" },
       { name: "Checkout API", url: "https://fake-url/checkout" },
-      { name: "Auth API", url: "https://fake-url/auth" },
-      { name: "Catalog API", url: "https://fake-url/catalog" }
+      { name: "Auth API", url: "https://fake-url/auth" }
     ]
   }
 ];
 
+// ========================
+// HEALTH
+// ========================
 async function loadHealth() {
   const grid = document.getElementById("health-grid");
+  const badge = document.getElementById("health-badge");
+
   grid.innerHTML = "";
+
+  let globalFailed = 0;
+  let globalTotal = 0;
 
   for (const env of environments) {
 
@@ -273,10 +266,12 @@ async function loadHealth() {
       arrow.classList.toggle("open");
     };
 
-    let total = env.services.length;
     let failed = 0;
+    let total = env.services.length;
 
     for (const service of env.services) {
+
+      globalTotal++;
 
       const serviceEl = document.createElement("div");
       serviceEl.className = "service";
@@ -291,7 +286,10 @@ async function loadHealth() {
         const data = await res.json();
         const isReady = data.checked === "ready";
 
-        if (!isReady) failed++;
+        if (!isReady) {
+          failed++;
+          globalFailed++;
+        }
 
         serviceEl.innerHTML = `
           <span>${service.name}</span>
@@ -300,13 +298,10 @@ async function loadHealth() {
           </span>
         `;
 
-        if (data.version && !card.dataset.versionAdded) {
-          title.innerText = `${env.name} (version: ${data.version})`;
-          card.dataset.versionAdded = true;
-        }
-
       } catch {
         failed++;
+        globalFailed++;
+
         serviceEl.innerHTML = `
           <span>${service.name}</span>
           <span class="status-bad">⚠️</span>
@@ -314,21 +309,29 @@ async function loadHealth() {
       }
     }
 
-    // STATUS FINAL
-    let badge = document.createElement("span");
+    // status do ambiente
+    let envStatus = document.createElement("span");
 
     if (failed === 0) {
-      badge.innerText = " 🟢 Healthy";
-      badge.className = "status-ok";
+      envStatus.innerText = " 🟢";
     } else if (failed < total) {
-      badge.innerText = " 🟡 Degraded";
-      badge.className = "status-warn";
+      envStatus.innerText = " 🟡";
     } else {
-      badge.innerText = " 🔴 Down";
-      badge.className = "status-bad";
+      envStatus.innerText = " 🔴";
     }
 
-    title.appendChild(badge);
+    title.appendChild(envStatus);
+  }
+
+  // ========================
+  // BADGE GLOBAL
+  // ========================
+  if (globalFailed === 0) {
+    badge.innerText = "🟢";
+  } else if (globalFailed < globalTotal) {
+    badge.innerText = "🟡";
+  } else {
+    badge.innerText = "🔴";
   }
 }
 </script>
