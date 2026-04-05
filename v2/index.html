@@ -19,7 +19,6 @@ body {
   margin: 0 auto;
 }
 
-/* MENU */
 .menu {
   display: flex;
   gap: 10px;
@@ -40,7 +39,6 @@ body {
   color: #0369A1;
 }
 
-/* SEARCH */
 .search input {
   width: 100%;
   padding: 14px;
@@ -48,14 +46,12 @@ body {
   border: 1px solid #E2E8F0;
 }
 
-/* GRID */
 .grid {
   display: grid;
   gap: 16px;
   margin-top: 20px;
 }
 
-/* CARD */
 .card {
   background: #FFFFFF;
   padding: 18px;
@@ -63,12 +59,10 @@ body {
   border: 1px solid #E2E8F0;
 }
 
-/* TITLE */
 .title {
   font-weight: 600;
 }
 
-/* BUTTONS */
 .buttons {
   display: flex;
   gap: 10px;
@@ -128,6 +122,7 @@ body {
 
 .status-ok { color: #16A34A; }
 .status-bad { color: #DC2626; }
+.status-warn { color: #D97706; }
 </style>
 </head>
 
@@ -135,7 +130,6 @@ body {
 
 <div class="container">
 
-  <!-- MENU -->
   <div class="menu">
     <button class="menu-item active" onclick="showPage('deeplinks')">Deeplinks</button>
     <button class="menu-item" onclick="showPage('health')">Health</button>
@@ -161,9 +155,7 @@ body {
 </div>
 
 <script>
-// ========================
 // NAV
-// ========================
 function showPage(page) {
   document.getElementById('deeplinks-page').style.display =
     page === 'deeplinks' ? 'block' : 'none';
@@ -232,7 +224,7 @@ document.getElementById("search").addEventListener("input", function () {
 });
 
 // ========================
-// HEALTH (EXPANSÍVEL)
+// HEALTH (INTELIGENTE)
 // ========================
 const environments = [
   {
@@ -281,7 +273,8 @@ async function loadHealth() {
       arrow.classList.toggle("open");
     };
 
-    let envIsHealthy = true;
+    let total = env.services.length;
+    let failed = 0;
 
     for (const service of env.services) {
 
@@ -298,7 +291,7 @@ async function loadHealth() {
         const data = await res.json();
         const isReady = data.checked === "ready";
 
-        if (!isReady) envIsHealthy = false;
+        if (!isReady) failed++;
 
         serviceEl.innerHTML = `
           <span>${service.name}</span>
@@ -313,8 +306,7 @@ async function loadHealth() {
         }
 
       } catch {
-        envIsHealthy = false;
-
+        failed++;
         serviceEl.innerHTML = `
           <span>${service.name}</span>
           <span class="status-bad">⚠️</span>
@@ -322,8 +314,20 @@ async function loadHealth() {
       }
     }
 
-    const badge = document.createElement("span");
-    badge.innerText = envIsHealthy ? " 🟢" : " 🔴";
+    // STATUS FINAL
+    let badge = document.createElement("span");
+
+    if (failed === 0) {
+      badge.innerText = " 🟢 Healthy";
+      badge.className = "status-ok";
+    } else if (failed < total) {
+      badge.innerText = " 🟡 Degraded";
+      badge.className = "status-warn";
+    } else {
+      badge.innerText = " 🔴 Down";
+      badge.className = "status-bad";
+    }
+
     title.appendChild(badge);
   }
 }
