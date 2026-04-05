@@ -19,6 +19,7 @@ body {
   margin: 0 auto;
 }
 
+/* MENU */
 .menu {
   display: flex;
   gap: 10px;
@@ -39,6 +40,7 @@ body {
   color: #0369A1;
 }
 
+/* SEARCH */
 .search input {
   width: 100%;
   padding: 14px;
@@ -46,12 +48,14 @@ body {
   border: 1px solid #E2E8F0;
 }
 
+/* GRID */
 .grid {
   display: grid;
   gap: 16px;
   margin-top: 20px;
 }
 
+/* CARD */
 .card {
   background: #FFFFFF;
   padding: 18px;
@@ -59,14 +63,16 @@ body {
   border: 1px solid #E2E8F0;
 }
 
+/* TITLE */
 .title {
   font-weight: 600;
-  margin-bottom: 10px;
 }
 
+/* BUTTONS */
 .buttons {
   display: flex;
   gap: 10px;
+  margin-top: 10px;
 }
 
 .btn {
@@ -88,10 +94,36 @@ body {
   color: #334155;
 }
 
+/* HEALTH */
+.toggle {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.arrow {
+  transition: transform 0.2s ease;
+}
+
+.arrow.open {
+  transform: rotate(90deg);
+}
+
+.services {
+  margin-top: 10px;
+  display: none;
+}
+
+.services.open {
+  display: block;
+}
+
 .service {
   display: flex;
   justify-content: space-between;
-  margin-top: 6px;
+  margin-top: 8px;
+  font-size: 14px;
 }
 
 .status-ok { color: #16A34A; }
@@ -103,6 +135,7 @@ body {
 
 <div class="container">
 
+  <!-- MENU -->
   <div class="menu">
     <button class="menu-item active" onclick="showPage('deeplinks')">Deeplinks</button>
     <button class="menu-item" onclick="showPage('health')">Health</button>
@@ -128,7 +161,9 @@ body {
 </div>
 
 <script>
+// ========================
 // NAV
+// ========================
 function showPage(page) {
   document.getElementById('deeplinks-page').style.display =
     page === 'deeplinks' ? 'block' : 'none';
@@ -147,7 +182,7 @@ function showPage(page) {
 }
 
 // ========================
-// DEEPLINKS (CORRIGIDO)
+// DEEPLINKS
 // ========================
 const deeplinks = [
   { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
@@ -197,39 +232,63 @@ document.getElementById("search").addEventListener("input", function () {
 });
 
 // ========================
-// HEALTH (CORRIGIDO)
+// HEALTH (EXPANSÍVEL)
 // ========================
 const environments = [
   {
     name: "PRD",
     services: [
-      {
-        name: "Home API",
-        url: "https://www.petz.com.br/home/api/readiness"
-      }
+      { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" },
+      { name: "Checkout API", url: "https://fake-url/checkout" },
+      { name: "Auth API", url: "https://fake-url/auth" },
+      { name: "Catalog API", url: "https://fake-url/catalog" }
     ]
   }
 ];
 
 async function loadHealth() {
   const grid = document.getElementById("health-grid");
-  if (!grid) return;
-
   grid.innerHTML = "";
 
   for (const env of environments) {
 
     const card = document.createElement("div");
     card.className = "card";
-    card.innerHTML = `<div class="title">${env.name}</div>`;
+
+    const header = document.createElement("div");
+    header.className = "toggle";
+
+    const title = document.createElement("div");
+    title.className = "title";
+    title.innerText = env.name;
+
+    const arrow = document.createElement("div");
+    arrow.className = "arrow";
+    arrow.innerText = "▶";
+
+    header.appendChild(title);
+    header.appendChild(arrow);
+
+    const servicesContainer = document.createElement("div");
+    servicesContainer.className = "services";
+
+    card.appendChild(header);
+    card.appendChild(servicesContainer);
     grid.appendChild(card);
+
+    header.onclick = () => {
+      servicesContainer.classList.toggle("open");
+      arrow.classList.toggle("open");
+    };
+
+    let envIsHealthy = true;
 
     for (const service of env.services) {
 
       const serviceEl = document.createElement("div");
       serviceEl.className = "service";
       serviceEl.innerHTML = `<span>${service.name}</span><span>🔄</span>`;
-      card.appendChild(serviceEl);
+      servicesContainer.appendChild(serviceEl);
 
       try {
         const res = await fetch(
@@ -237,8 +296,9 @@ async function loadHealth() {
         );
 
         const data = await res.json();
-
         const isReady = data.checked === "ready";
+
+        if (!isReady) envIsHealthy = false;
 
         serviceEl.innerHTML = `
           <span>${service.name}</span>
@@ -248,18 +308,23 @@ async function loadHealth() {
         `;
 
         if (data.version && !card.dataset.versionAdded) {
-          card.querySelector(".title").innerText =
-            `${env.name} (version: ${data.version})`;
+          title.innerText = `${env.name} (version: ${data.version})`;
           card.dataset.versionAdded = true;
         }
 
-      } catch (err) {
+      } catch {
+        envIsHealthy = false;
+
         serviceEl.innerHTML = `
           <span>${service.name}</span>
           <span class="status-bad">⚠️</span>
         `;
       }
     }
+
+    const badge = document.createElement("span");
+    badge.innerText = envIsHealthy ? " 🟢" : " 🔴";
+    title.appendChild(badge);
   }
 }
 </script>
