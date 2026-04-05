@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QA Portal</title>
 
 <style>
@@ -34,6 +34,11 @@ body {
   border: 1px solid #E2E8F0;
   background: #FFFFFF;
   cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.menu-item:active {
+  transform: scale(0.95);
 }
 
 .menu-item.active {
@@ -60,6 +65,13 @@ body {
   border-radius: 14px;
   border: 1px solid #E2E8F0;
   font-size: 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search input:focus {
+  border-color: #38BDF8;
+  box-shadow: 0 0 0 2px rgba(56,189,248,0.2);
+  outline: none;
 }
 
 .search-icon {
@@ -87,6 +99,16 @@ body {
   padding: 18px;
   border-radius: 16px;
   border: 1px solid #E2E8F0;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+}
+
+.card:active {
+  transform: scale(0.98);
 }
 
 .title {
@@ -109,6 +131,18 @@ body {
   text-align: center;
   text-decoration: none;
   font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease, opacity 0.1s ease;
+}
+
+.btn:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+.btn:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .android {
@@ -131,7 +165,7 @@ body {
 }
 
 .arrow {
-  transition: transform 0.2s;
+  transition: transform 0.2s ease;
 }
 
 .arrow.open {
@@ -151,6 +185,21 @@ body {
   display: flex;
   justify-content: space-between;
   margin-top: 8px;
+  animation: fadeIn 0.2s ease;
+}
+
+/* ========================
+   ANIMAÇÕES
+======================== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ========================
