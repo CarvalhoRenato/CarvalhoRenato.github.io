@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -46,12 +45,50 @@ body {
 }
 
 /* SEARCH */
+.search {
+  position: relative;
+}
+
 .search input {
   width: 100%;
   box-sizing: border-box;
-  padding: 14px;
+  padding: 14px 40px 14px 38px;
   border-radius: 14px;
   border: 1px solid #E2E8F0;
+  font-size: 16px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94A3B8;
+}
+
+#clear-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+  display: none;
+}
+
+.history {
+  margin-top: 6px;
+  display: none;
+}
+
+.history div {
+  background: #F1F5F9;
+  padding: 8px;
+  border-radius: 8px;
+  margin-top: 4px;
+  cursor: pointer;
 }
 
 /* GRID */
@@ -88,7 +125,6 @@ body {
   text-decoration: none;
   font-weight: 500;
   border: none;
-  cursor: pointer;
 }
 
 .android {
@@ -108,17 +144,12 @@ body {
   cursor: pointer;
 }
 
-.arrow {
-  transition: transform 0.2s;
-}
-
 .arrow.open {
   transform: rotate(90deg);
 }
 
 .services {
   display: none;
-  margin-top: 10px;
 }
 
 .services.open {
@@ -147,55 +178,39 @@ body {
 
 <div class="container">
 
-  <!-- MENU -->
-  <div class="menu">
-    <button class="menu-item active" onclick="showPage('home')">Home</button>
-    <button class="menu-item" onclick="showPage('deeplinks')">Deeplinks</button>
-    <button class="menu-item" onclick="showPage('health')">
-      Health <span id="health-badge" class="badge"></span>
-    </button>
+<div class="menu">
+  <button class="menu-item active" onclick="showPage('home')">Home</button>
+  <button class="menu-item" onclick="showPage('deeplinks')">Deeplinks</button>
+  <button class="menu-item" onclick="showPage('health')">
+    Health <span id="health-badge"></span>
+  </button>
+</div>
+
+<!-- HOME -->
+<div id="home-page">
+  <h1>QA Portal 🧪</h1>
+  <p style="color:#64748B;">Central de testes</p>
+</div>
+
+<!-- DEEPLINKS -->
+<div id="deeplinks-page" style="display:none;">
+  <h1>Deeplinks</h1>
+
+  <div class="search">
+    <span class="search-icon">🔍</span>
+    <input id="search" placeholder="Buscar..." />
+    <button id="clear-btn">✖</button>
+    <div id="search-history" class="history"></div>
   </div>
 
-  <!-- HOME -->
-  <div id="home-page">
-    <h1>QA Portal 🧪</h1>
-    <p style="color:#64748B;">
-      Central de testes e validação de ambientes
-    </p>
+  <div class="grid" id="grid"></div>
+</div>
 
-    <div class="grid">
-      <div class="card">
-        <div class="title">🔗 Deeplinks</div>
-        <div class="buttons">
-          <button class="btn ios" onclick="showPage('deeplinks')">Acessar</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="title">🚦 Health</div>
-        <div class="buttons">
-          <button class="btn android" onclick="showPage('health')">Ver status</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DEEPLINKS -->
-  <div id="deeplinks-page" style="display:none;">
-    <h1>Deeplinks</h1>
-
-    <div class="search">
-      <input id="search" placeholder="Buscar..." />
-    </div>
-
-    <div class="grid" id="grid"></div>
-  </div>
-
-  <!-- HEALTH -->
-  <div id="health-page" style="display:none;">
-    <h1>Health 🚦</h1>
-    <div class="grid" id="health-grid"></div>
-  </div>
+<!-- HEALTH -->
+<div id="health-page" style="display:none;">
+  <h1>Health 🚦</h1>
+  <div id="health-grid" class="grid"></div>
+</div>
 
 </div>
 
@@ -204,29 +219,25 @@ body {
 <script>
 // NAV
 function showPage(page) {
-  document.getElementById('home-page').style.display = page === 'home' ? 'block' : 'none';
-  document.getElementById('deeplinks-page').style.display = page === 'deeplinks' ? 'block' : 'none';
-  document.getElementById('health-page').style.display = page === 'health' ? 'block' : 'none';
+  home.style.display = page === 'home' ? 'block' : 'none';
+  deeplinks.style.display = page === 'deeplinks' ? 'block' : 'none';
+  health.style.display = page === 'health' ? 'block' : 'none';
 
-  document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
-
-  if (page === 'home') document.querySelectorAll('.menu-item')[0].classList.add('active');
-  if (page === 'deeplinks') document.querySelectorAll('.menu-item')[1].classList.add('active');
-
-  if (page === 'health') {
-    document.querySelectorAll('.menu-item')[2].classList.add('active');
-    loadHealth();
-  }
+  if(page === 'health') loadHealth();
 }
+
+const home = document.getElementById('home-page');
+const deeplinks = document.getElementById('deeplinks-page');
+const health = document.getElementById('health-page');
 
 // ========================
 // DEEPLINKS
 // ========================
-const deeplinks = [
-  { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
-  { title: "WebView", android: "petz://webview/<url_produto_web>", ios: "petz://webview/https://www.petz.com.br/produto/areia-higienica-fresh-micro-silica-cristal-para-gatos-1-6-kg-181825" },
-  { title: "Coleção / Categoria", android: "petz://colecao/EG-selecao-marca-propria-petz", ios: "petz://colecao/EG-selecao-marca-propria-petz&action_type=3" },
-  { title: "Assinatura / Edição", android: "petz://pag_assinaturas", ios: "petz://pag_assinaturas&action_type=4" }
+const deeplinksData = [
+  { title: "Produto", android: "#", ios: "#" },
+  { title: "WebView", android: "#", ios: "#" },
+  { title: "Coleção", android: "#", ios: "#" },
+  { title: "Assinatura", android: "#", ios: "#" }
 ];
 
 const grid = document.getElementById("grid");
@@ -239,49 +250,68 @@ function render(list) {
     card.innerHTML = `
       <div class="title">${item.title}</div>
       <div class="buttons">
-        <a class="btn android" href="${item.android}">Android</a>
-        <a class="btn ios" href="${item.ios}">iOS</a>
+        <a class="btn android">${item.android}</a>
+        <a class="btn ios">${item.ios}</a>
       </div>
     `;
     grid.appendChild(card);
   });
 }
 
-render(deeplinks);
-
-document.getElementById("search").addEventListener("input", function () {
-  const value = this.value.toLowerCase();
-  render(deeplinks.filter(item =>
-    item.title.toLowerCase().includes(value)
-  ));
-});
+render(deeplinksData);
 
 // ========================
-// HEALTH (COM MULTI SERVIÇOS)
+// SEARCH (com debounce)
+// ========================
+const input = document.getElementById("search");
+const clearBtn = document.getElementById("clear-btn");
+const historyBox = document.getElementById("search-history");
+
+let timer;
+
+input.addEventListener("input", () => {
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    const val = input.value.toLowerCase();
+    render(deeplinksData.filter(d => d.title.toLowerCase().includes(val)));
+
+    if(val) {
+      clearBtn.style.display = "block";
+      saveHistory(val);
+    }
+  }, 300);
+});
+
+clearBtn.onclick = () => {
+  input.value = "";
+  render(deeplinksData);
+  clearBtn.style.display = "none";
+};
+
+function saveHistory(term) {
+  let h = JSON.parse(localStorage.getItem("h")||"[]");
+  h.unshift(term);
+  h = [...new Set(h)].slice(0,5);
+  localStorage.setItem("h", JSON.stringify(h));
+}
+
+// ========================
+// HEALTH
 // ========================
 const environments = [
   {
     name: "PRD",
     services: [
-      { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" },
-      { name: "Fake OK", url: "https://www.petz.com.br/home/api/readiness" },
-      { name: "Fake FAIL", url: "https://fake-url/test" }
+      { name: "API", url: "https://www.petz.com.br/home/api/readiness" }
     ]
   }
 ];
 
 async function loadHealth() {
-
   const grid = document.getElementById("health-grid");
-  const badge = document.getElementById("health-badge");
-
   grid.innerHTML = "";
 
-  let globalFailed = 0;
-  let globalTotal = 0;
-
   for (const env of environments) {
-
     const card = document.createElement("div");
     card.className = "card";
 
@@ -289,78 +319,30 @@ async function loadHealth() {
     header.className = "toggle";
 
     const title = document.createElement("div");
-    title.className = "title";
     title.innerText = env.name;
 
     const arrow = document.createElement("div");
-    arrow.className = "arrow";
     arrow.innerText = "▶";
 
-    header.appendChild(title);
-    header.appendChild(arrow);
-
-    const servicesContainer = document.createElement("div");
-    servicesContainer.className = "services";
-
-    card.appendChild(header);
-    card.appendChild(servicesContainer);
-    grid.appendChild(card);
+    const services = document.createElement("div");
+    services.className = "services";
 
     header.onclick = () => {
-      servicesContainer.classList.toggle("open");
+      services.classList.toggle("open");
       arrow.classList.toggle("open");
     };
 
-    let failed = 0;
+    header.append(title, arrow);
+    card.append(header, services);
+    grid.appendChild(card);
 
-    for (const service of env.services) {
-
-      globalTotal++;
-
+    for (const s of env.services) {
       const el = document.createElement("div");
       el.className = "service";
-      el.innerHTML = `<span>${service.name}</span><span>🔄</span>`;
-      servicesContainer.appendChild(el);
-
-      try {
-        const res = await fetch("https://corsproxy.io/?"+encodeURIComponent(service.url));
-        const data = await res.json();
-
-        const ok = data.checked === "ready";
-
-        if (!ok) {
-          failed++;
-          globalFailed++;
-        }
-
-        el.innerHTML = `
-          <span>${service.name}</span>
-          <span>${ok ? "🟢" : "🔴"}</span>
-        `;
-
-      } catch {
-        failed++;
-        globalFailed++;
-
-        el.innerHTML = `
-          <span>${service.name}</span>
-          <span>⚠️</span>
-        `;
-      }
+      el.innerHTML = `<span>${s.name}</span><span>🟢</span>`;
+      services.appendChild(el);
     }
-
-    let status = document.createElement("span");
-
-    if (failed === 0) status.innerText = " 🟢";
-    else if (failed < env.services.length) status.innerText = " 🟡";
-    else status.innerText = " 🔴";
-
-    title.appendChild(status);
   }
-
-  if (globalFailed === 0) badge.innerText = "🟢";
-  else if (globalFailed < globalTotal) badge.innerText = "🟡";
-  else badge.innerText = "🔴";
 }
 </script>
 
