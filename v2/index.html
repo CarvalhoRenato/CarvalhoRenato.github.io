@@ -350,7 +350,16 @@ reportBtn.style.cursor = "pointer";
 // 👉 impede clique de expandir quando clicar no botão
 reportBtn.onclick = (e) => {
   e.stopPropagation();
-  alert("Reportar incidente (futuro Jira/Teams)");
+
+  const confirmacao = confirm("Deseja reportar este incidente no Teams?");
+
+  if (confirmacao) {
+    // 🔥 placeholder da ação futura
+    alert("Incidente enviado para o Teams (simulação)");
+    
+    // 👉 aqui depois entra:
+    // sendToTeams(env, service)
+  }
 };
 
 left.appendChild(title);
