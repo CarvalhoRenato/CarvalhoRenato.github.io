@@ -122,12 +122,37 @@ body {
 }
 
 /* ========================
+   REPORT BUTTON
+======================== */
+.report-btn {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  cursor: pointer;
+}
+
+/* ========================
    HEALTH
 ======================== */
 .toggle {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   cursor: pointer;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .arrow {
@@ -251,22 +276,10 @@ function showPage(page) {
 // DEEPLINKS
 // ========================
 const deeplinks = [
-  { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
-  { title: "WebView", android: "petz://webview/<url_produto_web>", ios: "petz://webview/https://www.petz.com.br/produto/areia-higienica-fresh-micro-silica-cristal-para-gatos-1-6-kg-181825" },
-  { title: "Coleção / Categoria", android: "petz://colecao/EG-selecao-marca-propria-petz", ios: "petz://colecao/EG-selecao-marca-propria-petz&action_type=3" },
-  { title: "Assinatura / Edição", android: "petz://pag_assinaturas", ios: "petz://pag_assinaturas&action_type=4" },
-  { title: "Lojas", android: "petz://pag_lojas", ios: "petz://pag_lojas&action_type=5" },
-  { title: "Ofertas", android: "petz://minhas_ofertas", ios: "petz://minhas_ofertas&action_type=6" },
-  { title: "Banho & Tosa", android: "petz://banho_tosa", ios: "petz://banho_tosa&action_type=7" },
-  { title: "Meus Pets", android: "petz://meus_pets", ios: "petz://meus_pets" },
-  { title: "Seres", android: "petz://seres", ios: "petz://seres" },
-  { title: "Feed Petz", android: "petz://feed_petz", ios: "petz://feed_petz" },
-  { title: "Carteira", android: "petz://carteira", ios: "petz://carteira&action_type=11" },
-  { title: "Blog Petz", android: "blog_petz", ios: "petz://webview/https://www.petz.com.br/blog/" },
-  { title: "Home Clubz", android: "clubz_home", ios: "petz://clubz_home" },
-  { title: "Cupons", android: "cupons", ios: "petz://cupons" },
-  { title: "Plano de Saúde", android: "petz://healthcare", ios: "petz://healthcare" },
-  { title: "Home", android: "petz://home", ios: "petz://home" }
+  { title: "Produto", android: "petz://produto", ios: "petz://produto" },
+  { title: "WebView", android: "petz://webview", ios: "petz://webview" },
+  { title: "Coleção", android: "petz://colecao", ios: "petz://colecao" },
+  { title: "Assinatura", android: "petz://assinatura", ios: "petz://assinatura" }
 ];
 
 const grid = document.getElementById("grid");
@@ -297,7 +310,7 @@ document.getElementById("search").addEventListener("input", function () {
 });
 
 // ========================
-// HEALTH (COMPLETO)
+// HEALTH
 // ========================
 const environments = [
   {
@@ -311,6 +324,7 @@ const environments = [
 ];
 
 async function loadHealth() {
+
   const grid = document.getElementById("health-grid");
   const badge = document.getElementById("health-badge");
 
@@ -327,6 +341,12 @@ async function loadHealth() {
     const header = document.createElement("div");
     header.className = "toggle";
 
+    const left = document.createElement("div");
+    left.className = "header-left";
+
+    const right = document.createElement("div");
+    right.className = "header-right";
+
     const title = document.createElement("div");
     title.className = "title";
     title.innerText = env.name;
@@ -335,8 +355,16 @@ async function loadHealth() {
     arrow.className = "arrow";
     arrow.innerText = "▶";
 
-    header.appendChild(title);
-    header.appendChild(arrow);
+    const reportBtn = document.createElement("button");
+    reportBtn.className = "report-btn";
+    reportBtn.innerText = "Reportar";
+
+    left.appendChild(title);
+    right.appendChild(reportBtn);
+    right.appendChild(arrow);
+
+    header.appendChild(left);
+    header.appendChild(right);
 
     const servicesContainer = document.createElement("div");
     servicesContainer.className = "services";
