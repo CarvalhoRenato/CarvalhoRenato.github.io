@@ -45,9 +45,15 @@ body {
   font-weight: 600;
 }
 
-/* INPUT */
+/* SEARCH FIX */
+.search {
+  margin-top: 10px;
+}
+
 .search input {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 14px;
   border-radius: 14px;
   border: 1px solid #E2E8F0;
@@ -130,6 +136,18 @@ body {
 
 .status-ok { color: #16A34A; }
 .status-bad { color: #DC2626; }
+
+/* WATERMARK */
+.watermark {
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  color: #94A3B8;
+  pointer-events: none;
+}
 </style>
 </head>
 
@@ -189,11 +207,17 @@ body {
 
 </div>
 
+<!-- WATERMARK -->
+<div class="watermark">
+  Desenvolvido por Chapter QA
+</div>
+
 <script>
-// ========================
+let healthInterval = null;
+
 // NAV
-// ========================
 function showPage(page) {
+
   document.getElementById('home-page').style.display =
     page === 'home' ? 'block' : 'none';
 
@@ -208,14 +232,23 @@ function showPage(page) {
   if (page === 'home') document.querySelectorAll('.menu-item')[0].classList.add('active');
   if (page === 'deeplinks') document.querySelectorAll('.menu-item')[1].classList.add('active');
 
+  if (healthInterval) {
+    clearInterval(healthInterval);
+    healthInterval = null;
+  }
+
   if (page === 'health') {
     document.querySelectorAll('.menu-item')[2].classList.add('active');
+
     loadHealth();
+
+    // 🔄 AUTO REFRESH
+    healthInterval = setInterval(loadHealth, 30000);
   }
 }
 
 // ========================
-// DEEPLINKS (COMPLETO)
+// DEEPLINKS (NÃO ALTERAR)
 // ========================
 const deeplinks = [
   { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
@@ -271,9 +304,7 @@ const environments = [
   {
     name: "PRD",
     services: [
-      { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" },
-      { name: "Checkout API", url: "https://fake-url/checkout" },
-      { name: "Auth API", url: "https://fake-url/auth" }
+      { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" }
     ]
   }
 ];
@@ -292,42 +323,16 @@ async function loadHealth() {
     const card = document.createElement("div");
     card.className = "card";
 
-    const header = document.createElement("div");
-    header.className = "toggle";
-
     const title = document.createElement("div");
     title.className = "title";
     title.innerText = env.name;
 
-    const arrow = document.createElement("div");
-    arrow.innerText = "▶";
-
-    header.appendChild(title);
-    header.appendChild(arrow);
-
-    const servicesContainer = document.createElement("div");
-    servicesContainer.className = "services";
-
-    card.appendChild(header);
-    card.appendChild(servicesContainer);
+    card.appendChild(title);
     grid.appendChild(card);
-
-    header.onclick = () => {
-      servicesContainer.classList.toggle("open");
-      arrow.classList.toggle("open");
-    };
-
-    let failed = 0;
-    let total = env.services.length;
 
     for (const service of env.services) {
 
       globalTotal++;
-
-      const serviceEl = document.createElement("div");
-      serviceEl.className = "service";
-      serviceEl.innerHTML = `<span>${service.name}</span><span>🔄</span>`;
-      servicesContainer.appendChild(serviceEl);
 
       try {
         const res = await fetch("https://corsproxy.io/?"+encodeURIComponent(service.url));
@@ -335,39 +340,22 @@ async function loadHealth() {
 
         const isReady = data.checked === "ready";
 
-        if (!isReady) {
-          failed++;
-          globalFailed++;
-        }
+        if (!isReady) globalFailed++;
 
-        serviceEl.innerHTML = `
-          <span>${service.name}</span>
-          <span class="${isReady ? "status-ok" : "status-bad"}">
-            ${isReady ? "🟢" : "🔴"}
-          </span>
-        `;
+        const status = document.createElement("div");
+        status.innerHTML = `${service.name}: ${isReady ? "🟢" : "🔴"}`;
+        card.appendChild(status);
 
       } catch {
-        failed++;
         globalFailed++;
 
-        serviceEl.innerHTML = `
-          <span>${service.name}</span>
-          <span class="status-bad">⚠️</span>
-        `;
+        const status = document.createElement("div");
+        status.innerHTML = `${service.name}: ⚠️`;
+        card.appendChild(status);
       }
     }
-
-    let badgeEnv = document.createElement("span");
-
-    if (failed === 0) badgeEnv.innerText = " 🟢";
-    else if (failed < total) badgeEnv.innerText = " 🟡";
-    else badgeEnv.innerText = " 🔴";
-
-    title.appendChild(badgeEnv);
   }
 
-  // BADGE MENU
   if (globalFailed === 0) badge.innerText = "🟢";
   else if (globalFailed < globalTotal) badge.innerText = "🟡";
   else badge.innerText = "🔴";
