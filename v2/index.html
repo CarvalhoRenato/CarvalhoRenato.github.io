@@ -41,22 +41,16 @@ body {
 }
 
 /* SEARCH */
-.search {
-  margin-top: 16px;
-}
-
 .search input {
   width: 100%;
   padding: 14px;
   border-radius: 14px;
   border: 1px solid #E2E8F0;
-  box-sizing: border-box;
 }
 
 /* GRID */
 .grid {
   display: grid;
-  grid-template-columns: 1fr;
   gap: 16px;
   margin-top: 20px;
 }
@@ -69,6 +63,7 @@ body {
   border: 1px solid #E2E8F0;
 }
 
+/* TITLE */
 .title {
   font-weight: 600;
   margin-bottom: 10px;
@@ -99,8 +94,20 @@ body {
   color: #334155;
 }
 
-.btn:active {
-  transform: scale(0.97);
+/* SERVICE */
+.service {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.status-ok {
+  color: #16A34A;
+}
+
+.status-bad {
+  color: #DC2626;
 }
 </style>
 </head>
@@ -121,7 +128,7 @@ body {
     <h1>Deeplinks</h1>
 
     <div class="search">
-      <input id="search" placeholder="Buscar fluxo, tela ou deeplink..." />
+      <input id="search" placeholder="Buscar..." />
     </div>
 
     <div class="grid" id="grid"></div>
@@ -130,18 +137,15 @@ body {
 
   <!-- HEALTH -->
   <div id="health-page" style="display:none;">
-
     <h1>Health 🚦</h1>
-
     <div class="grid" id="health-grid"></div>
-
   </div>
 
 </div>
 
 <script>
 // ========================
-// NAVIGATION
+// NAV
 // ========================
 function showPage(page) {
   document.getElementById('deeplinks-page').style.display =
@@ -163,30 +167,12 @@ function showPage(page) {
 }
 
 // ========================
-// DATA (DEEPLINKS)
+// DEEPLINKS (mantido)
 // ========================
 const deeplinks = [
   { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
-  { title: "WebView", android: "petz://webview/<url_produto_web>", ios: "petz://webview/https://www.petz.com.br/produto/areia-higienica-fresh-micro-silica-cristal-para-gatos-1-6-kg-181825" },
-  { title: "Coleção / Categoria", android: "petz://colecao/EG-selecao-marca-propria-petz", ios: "petz://colecao/EG-selecao-marca-propria-petz&action_type=3" },
-  { title: "Assinatura / Edição", android: "petz://pag_assinaturas", ios: "petz://pag_assinaturas&action_type=4" },
-  { title: "Lojas", android: "petz://pag_lojas", ios: "petz://pag_lojas&action_type=5" },
-  { title: "Ofertas", android: "petz://minhas_ofertas", ios: "petz://minhas_ofertas&action_type=6" },
-  { title: "Banho & Tosa", android: "petz://banho_tosa", ios: "petz://banho_tosa&action_type=7" },
-  { title: "Meus Pets", android: "petz://meus_pets", ios: "petz://meus_pets" },
-  { title: "Seres", android: "petz://seres", ios: "petz://seres" },
-  { title: "Feed Petz", android: "petz://feed_petz", ios: "petz://feed_petz" },
-  { title: "Carteira", android: "petz://carteira", ios: "petz://carteira&action_type=11" },
-  { title: "Blog Petz", android: "blog_petz", ios: "petz://webview/https://www.petz.com.br/blog/" },
-  { title: "Home Clubz", android: "clubz_home", ios: "petz://clubz_home" },
-  { title: "Cupons", android: "cupons", ios: "petz://cupons" },
-  { title: "Plano de Saúde", android: "petz://healthcare", ios: "petz://healthcare" },
-  { title: "Home", android: "petz://home", ios: "petz://home" }
 ];
 
-// ========================
-// RENDER DEEPLINKS
-// ========================
 const grid = document.getElementById("grid");
 
 function render(list) {
@@ -211,36 +197,43 @@ function render(list) {
 render(deeplinks);
 
 // ========================
-// SEARCH
-// ========================
-document.getElementById("search").addEventListener("input", function () {
-  const value = this.value.toLowerCase();
-
-  const filtered = deeplinks.filter(item =>
-    item.title.toLowerCase().includes(value) ||
-    item.android.toLowerCase().includes(value) ||
-    item.ios.toLowerCase().includes(value)
-  );
-
-  render(filtered);
-});
-
-// ========================
-// HEALTH CONFIG
+// HEALTH CONFIG (ESCALÁVEL)
 // ========================
 const environments = [
   {
     name: "PRD",
-    readiness: "https://www.petz.com.br/home/api/readiness"
+    services: [
+      {
+        name: "Home API",
+        url: "https://www.petz.com.br/home/api/readiness"
+      }
+    ]
+  },
+  {
+    name: "STG",
+    services: [
+      {
+        name: "Home API",
+        url: "URL_STG_AQUI"
+      }
+    ]
+  },
+  {
+    name: "DEV",
+    services: [
+      {
+        name: "Home API",
+        url: "URL_DEV_AQUI"
+      }
+    ]
   }
 ];
 
 // ========================
-// LOAD HEALTH (SIMPLIFICADO)
+// LOAD HEALTH (MULTI)
 // ========================
 async function loadHealth() {
   const grid = document.getElementById("health-grid");
-
   if (!grid) return;
 
   grid.innerHTML = "";
@@ -249,28 +242,48 @@ async function loadHealth() {
 
     const card = document.createElement("div");
     card.className = "card";
-    card.innerHTML = `<div class="title">${env.name}</div><div>🔄 Verificando...</div>`;
+    card.innerHTML = `<div class="title">${env.name}</div>`;
     grid.appendChild(card);
 
-    try {
-      const res = await fetch(env.readiness);
-      const data = await res.json();
+    for (const service of env.services) {
 
-      const isReady = data.checked === "ready";
-      const version = data.version || "-";
-
-      card.innerHTML = `
-        <div class="title">${env.name} (version: ${version})</div>
-        <div style="font-weight:600; color:${isReady ? "#16A34A" : "#DC2626"};">
-          ${isReady ? "🟢 Ativo" : "🔴 Inativo"}
-        </div>
+      const serviceEl = document.createElement("div");
+      serviceEl.className = "service";
+      serviceEl.innerHTML = `
+        <span>${service.name}</span>
+        <span>🔄</span>
       `;
+      card.appendChild(serviceEl);
 
-    } catch (err) {
-      card.innerHTML = `
-        <div class="title">${env.name}</div>
-        <div style="color:#DC2626;">⚠️ Erro ao verificar</div>
-      `;
+      try {
+        const res = await fetch(
+          "https://api.allorigins.win/raw?url=" + encodeURIComponent(service.url)
+        );
+
+        const data = await res.json();
+
+        const isReady = data.checked === "ready";
+
+        serviceEl.innerHTML = `
+          <span>${service.name}</span>
+          <span class="${isReady ? "status-ok" : "status-bad"}">
+            ${isReady ? "🟢" : "🔴"}
+          </span>
+        `;
+
+        // adiciona versão no título do ambiente (uma vez)
+        if (data.version && !card.dataset.versionAdded) {
+          card.querySelector(".title").innerText =
+            `${env.name} (version: ${data.version})`;
+          card.dataset.versionAdded = true;
+        }
+
+      } catch (err) {
+        serviceEl.innerHTML = `
+          <span>${service.name}</span>
+          <span class="status-bad">⚠️</span>
+        `;
+      }
     }
   }
 }
