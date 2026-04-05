@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>QA Portal</title>
 
 <style>
@@ -19,7 +19,9 @@ body {
   margin: 0 auto;
 }
 
-/* MENU */
+/* ========================
+   MENU
+======================== */
 .menu {
   display: flex;
   gap: 10px;
@@ -34,12 +36,6 @@ body {
   cursor: pointer;
 }
 
-/* 🔥 feedback */
-.menu-item:active {
-  transform: scale(0.96);
-  opacity: 0.8;
-}
-
 .menu-item.active {
   background: #E0F2FE;
   border-color: #38BDF8;
@@ -50,7 +46,9 @@ body {
   margin-left: 6px;
 }
 
-/* SEARCH */
+/* ========================
+   SEARCH
+======================== */
 .search {
   position: relative;
 }
@@ -72,14 +70,18 @@ body {
   color: #94A3B8;
 }
 
-/* GRID */
+/* ========================
+   GRID
+======================== */
 .grid {
   display: grid;
   gap: 16px;
   margin-top: 20px;
 }
 
-/* CARD */
+/* ========================
+   CARD
+======================== */
 .card {
   background: #FFFFFF;
   padding: 18px;
@@ -91,7 +93,9 @@ body {
   font-weight: 600;
 }
 
-/* BUTTONS */
+/* ========================
+   BUTTONS
+======================== */
 .buttons {
   display: flex;
   gap: 10px;
@@ -105,16 +109,6 @@ body {
   text-align: center;
   text-decoration: none;
   font-weight: 500;
-  border: none;
-  cursor: pointer;
-
-  /* 🔥 feedback */
-  transition: transform 0.1s ease, opacity 0.1s ease;
-}
-
-.btn:active {
-  transform: scale(0.96);
-  opacity: 0.8;
 }
 
 .android {
@@ -127,7 +121,9 @@ body {
   color: #334155;
 }
 
-/* HEALTH */
+/* ========================
+   HEALTH
+======================== */
 .toggle {
   display: flex;
   justify-content: space-between;
@@ -157,7 +153,9 @@ body {
   margin-top: 8px;
 }
 
-/* WATERMARK */
+/* ========================
+   WATERMARK
+======================== */
 .watermark {
   position: fixed;
   bottom: 10px;
@@ -165,16 +163,6 @@ body {
   text-align: center;
   font-size: 12px;
   color: #94A3B8;
-}
-
-/* 🔥 transição páginas */
-.page {
-  transition: opacity 0.2s ease;
-}
-
-.hidden {
-  opacity: 0;
-  pointer-events: none;
 }
 </style>
 </head>
@@ -193,7 +181,7 @@ body {
   </div>
 
   <!-- HOME -->
-  <div id="home-page" class="page">
+  <div id="home-page">
     <h1>QA Portal 🧪</h1>
     <p style="color:#64748B;">
       Central de testes e validação de ambientes
@@ -217,7 +205,7 @@ body {
   </div>
 
   <!-- DEEPLINKS -->
-  <div id="deeplinks-page" class="page hidden">
+  <div id="deeplinks-page" style="display:none;">
     <h1>Deeplinks</h1>
 
     <div class="search">
@@ -229,7 +217,7 @@ body {
   </div>
 
   <!-- HEALTH -->
-  <div id="health-page" class="page hidden">
+  <div id="health-page" style="display:none;">
     <h1>Health 🚦</h1>
     <div class="grid" id="health-grid"></div>
   </div>
@@ -239,22 +227,14 @@ body {
 <div class="watermark">Desenvolvido por Chapter QA</div>
 
 <script>
-// NAV (🔥 atualizado com transição)
+
+// ========================
+// NAV
+// ========================
 function showPage(page) {
-
-  const pages = {
-    home: document.getElementById('home-page'),
-    deeplinks: document.getElementById('deeplinks-page'),
-    health: document.getElementById('health-page')
-  };
-
-  Object.values(pages).forEach(p => p.classList.add("hidden"));
-
-  setTimeout(() => {
-    Object.entries(pages).forEach(([key, el]) => {
-      if (key === page) el.classList.remove("hidden");
-    });
-  }, 50);
+  document.getElementById('home-page').style.display = page === 'home' ? 'block' : 'none';
+  document.getElementById('deeplinks-page').style.display = page === 'deeplinks' ? 'block' : 'none';
+  document.getElementById('health-page').style.display = page === 'health' ? 'block' : 'none';
 
   document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
 
@@ -266,3 +246,152 @@ function showPage(page) {
     loadHealth();
   }
 }
+
+// ========================
+// DEEPLINKS
+// ========================
+const deeplinks = [
+  { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
+  { title: "WebView", android: "petz://webview/<url_produto_web>", ios: "petz://webview/https://www.petz.com.br/produto/areia-higienica-fresh-micro-silica-cristal-para-gatos-1-6-kg-181825" },
+  { title: "Coleção / Categoria", android: "petz://colecao/EG-selecao-marca-propria-petz", ios: "petz://colecao/EG-selecao-marca-propria-petz&action_type=3" },
+  { title: "Assinatura / Edição", android: "petz://pag_assinaturas", ios: "petz://pag_assinaturas&action_type=4" }
+];
+
+const grid = document.getElementById("grid");
+
+function render(list) {
+  grid.innerHTML = "";
+  list.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="title">${item.title}</div>
+      <div class="buttons">
+        <a class="btn android" href="${item.android}">Android</a>
+        <a class="btn ios" href="${item.ios}">iOS</a>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+render(deeplinks);
+
+document.getElementById("search").addEventListener("input", function () {
+  const value = this.value.toLowerCase();
+  render(deeplinks.filter(item =>
+    item.title.toLowerCase().includes(value)
+  ));
+});
+
+// ========================
+// HEALTH
+// ========================
+const environments = [
+  {
+    name: "PRD",
+    services: [
+      { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" },
+      { name: "Fake OK", url: "https://www.petz.com.br/home/api/readiness" },
+      { name: "Fake FAIL", url: "https://fake-url/test" }
+    ]
+  }
+];
+
+async function loadHealth() {
+
+  const grid = document.getElementById("health-grid");
+  const badge = document.getElementById("health-badge");
+
+  grid.innerHTML = "";
+
+  let globalFailed = 0;
+  let globalTotal = 0;
+
+  for (const env of environments) {
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const header = document.createElement("div");
+    header.className = "toggle";
+
+    const title = document.createElement("div");
+    title.className = "title";
+    title.innerText = env.name;
+
+    const arrow = document.createElement("div");
+    arrow.className = "arrow";
+    arrow.innerText = "▶";
+
+    header.appendChild(title);
+    header.appendChild(arrow);
+
+    const servicesContainer = document.createElement("div");
+    servicesContainer.className = "services";
+
+    card.appendChild(header);
+    card.appendChild(servicesContainer);
+    grid.appendChild(card);
+
+    header.onclick = () => {
+      servicesContainer.classList.toggle("open");
+      arrow.classList.toggle("open");
+    };
+
+    let failed = 0;
+
+    for (const service of env.services) {
+
+      globalTotal++;
+
+      const el = document.createElement("div");
+      el.className = "service";
+      el.innerHTML = `<span>${service.name}</span><span>🔄</span>`;
+      servicesContainer.appendChild(el);
+
+      try {
+        const res = await fetch("https://corsproxy.io/?"+encodeURIComponent(service.url));
+        const data = await res.json();
+
+        const ok = data.checked === "ready";
+
+        if (!ok) {
+          failed++;
+          globalFailed++;
+        }
+
+        el.innerHTML = `
+          <span>${service.name}</span>
+          <span>${ok ? "🟢" : "🔴"}</span>
+        `;
+
+      } catch {
+        failed++;
+        globalFailed++;
+
+        el.innerHTML = `
+          <span>${service.name}</span>
+          <span>⚠️</span>
+        `;
+      }
+    }
+
+    let status = document.createElement("span");
+
+    if (failed === 0) status.innerText = " 🟢";
+    else if (failed < env.services.length) status.innerText = " 🟡";
+    else status.innerText = " 🔴";
+
+    title.appendChild(status);
+  }
+
+  if (globalFailed === 0) badge.innerText = "🟢";
+  else if (globalFailed < globalTotal) badge.innerText = "🟡";
+  else badge.innerText = "🔴";
+}
+
+</script>
+
+</body>
+</html>
