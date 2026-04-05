@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -163,7 +164,6 @@ body {
     </p>
 
     <div class="grid">
-
       <div class="card">
         <div class="title">🔗 Deeplinks</div>
         <div class="buttons">
@@ -177,7 +177,6 @@ body {
           <button class="btn android" onclick="showPage('health')">Ver status</button>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -205,15 +204,9 @@ body {
 <script>
 // NAV
 function showPage(page) {
-
-  document.getElementById('home-page').style.display =
-    page === 'home' ? 'block' : 'none';
-
-  document.getElementById('deeplinks-page').style.display =
-    page === 'deeplinks' ? 'block' : 'none';
-
-  document.getElementById('health-page').style.display =
-    page === 'health' ? 'block' : 'none';
+  document.getElementById('home-page').style.display = page === 'home' ? 'block' : 'none';
+  document.getElementById('deeplinks-page').style.display = page === 'deeplinks' ? 'block' : 'none';
+  document.getElementById('health-page').style.display = page === 'health' ? 'block' : 'none';
 
   document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
 
@@ -227,7 +220,7 @@ function showPage(page) {
 }
 
 // ========================
-// DEEPLINKS (GARANTIDO)
+// DEEPLINKS
 // ========================
 const deeplinks = [
   { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
@@ -256,14 +249,23 @@ function render(list) {
 
 render(deeplinks);
 
+document.getElementById("search").addEventListener("input", function () {
+  const value = this.value.toLowerCase();
+  render(deeplinks.filter(item =>
+    item.title.toLowerCase().includes(value)
+  ));
+});
+
 // ========================
-// HEALTH
+// HEALTH (COM MULTI SERVIÇOS)
 // ========================
 const environments = [
   {
     name: "PRD",
     services: [
-      { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" }
+      { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" },
+      { name: "Fake OK", url: "https://www.petz.com.br/home/api/readiness" },
+      { name: "Fake FAIL", url: "https://fake-url/test" }
     ]
   }
 ];
