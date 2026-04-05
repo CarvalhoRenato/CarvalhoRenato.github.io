@@ -71,7 +71,7 @@ body {
 
 .title {
   font-weight: 600;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 /* BUTTONS */
@@ -231,13 +231,12 @@ document.getElementById("search").addEventListener("input", function () {
 const environments = [
   {
     name: "PRD",
-    readiness: "https://www.petz.com.br/home/api/readiness",
-    version: "https://www.petz.com.br/home/version.json"
+    readiness: "https://www.petz.com.br/home/api/readiness"
   }
 ];
 
 // ========================
-// LOAD HEALTH (SAFE)
+// LOAD HEALTH (SIMPLIFICADO)
 // ========================
 async function loadHealth() {
   const grid = document.getElementById("health-grid");
@@ -254,34 +253,23 @@ async function loadHealth() {
     grid.appendChild(card);
 
     try {
-      const [readinessRes, versionRes] = await Promise.all([
-        fetch(env.readiness),
-        fetch(env.version)
-      ]);
+      const res = await fetch(env.readiness);
+      const data = await res.json();
 
-      const readiness = await readinessRes.json();
-      const version = await versionRes.json();
-
-      const isReady = readiness.checked === "ready";
+      const isReady = data.checked === "ready";
+      const version = data.version || "-";
 
       card.innerHTML = `
-        <div class="title">${env.name}</div>
-        <div>${isReady ? "🟢 Ambiente pronto" : "🔴 Ambiente não pronto"}</div>
-        <div style="font-size:14px; color:#64748B; margin-top:8px;">
-          Versão: ${readiness.version || "-"}<br>
-          Ambiente: ${readiness.env || "-"}<br>
-          Último deploy: ${version.updatedAt || "-"}
-        </div>
-        <div style="margin-top:10px; font-weight:600; color:${isReady ? "#16A34A" : "#DC2626"};">
-          ${isReady ? "✔️ Testes liberados" : "❌ Testes bloqueados"}
+        <div class="title">${env.name} (version: ${version})</div>
+        <div style="font-weight:600; color:${isReady ? "#16A34A" : "#DC2626"};">
+          ${isReady ? "🟢 Ativo" : "🔴 Inativo"}
         </div>
       `;
 
     } catch (err) {
       card.innerHTML = `
         <div class="title">${env.name}</div>
-        <div>⚠️ Erro ao verificar</div>
-        <div style="color:#DC2626;">❌ Indisponível</div>
+        <div style="color:#DC2626;">⚠️ Erro ao verificar</div>
       `;
     }
   }
