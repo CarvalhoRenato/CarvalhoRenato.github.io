@@ -37,9 +37,14 @@ body {
 .menu-item.active {
   background: #E0F2FE;
   border-color: #38BDF8;
+  color: #0369A1;
 }
 
 /* SEARCH */
+.search {
+  margin-top: 16px;
+}
+
 .search input {
   width: 100%;
   padding: 14px;
@@ -81,14 +86,21 @@ body {
   border-radius: 12px;
   text-align: center;
   text-decoration: none;
+  font-weight: 500;
 }
 
 .android {
   background: #DCFCE7;
+  color: #166534;
 }
 
 .ios {
   background: #F1F5F9;
+  color: #334155;
+}
+
+.btn:active {
+  transform: scale(0.97);
 }
 </style>
 </head>
@@ -109,22 +121,11 @@ body {
     <h1>Deeplinks</h1>
 
     <div class="search">
-      <input id="search" placeholder="Buscar..." />
+      <input id="search" placeholder="Buscar fluxo, tela ou deeplink..." />
     </div>
 
-    <div class="grid">
+    <div class="grid" id="grid"></div>
 
-      <div class="card">
-        <div class="title">Produto</div>
-        <div class="buttons">
-          <a class="btn android" href="#">Android</a>
-          <a class="btn ios" href="#">iOS</a>
-        </div>
-      </div>
-
-      <!-- resto dos cards continua igual -->
-
-    </div>
   </div>
 
   <!-- HEALTH -->
@@ -134,10 +135,10 @@ body {
 
     <div class="card">
       <div class="title">STAGING</div>
-      <div>🟢 API</div>
+      <div>🟢 API Gateway</div>
       <div>🟢 Auth</div>
       <div>🔴 Checkout</div>
-      <div style="color:red; margin-top:10px;">
+      <div style="margin-top:10px; color:#DC2626; font-weight:600;">
         Testes bloqueados
       </div>
     </div>
@@ -147,6 +148,9 @@ body {
 </div>
 
 <script>
+// ========================
+// NAVIGATION
+// ========================
 function showPage(page) {
   document.getElementById('deeplinks-page').style.display =
     page === 'deeplinks' ? 'block' : 'none';
@@ -159,6 +163,70 @@ function showPage(page) {
   if (page === 'deeplinks') document.querySelectorAll('.menu-item')[0].classList.add('active');
   if (page === 'health') document.querySelectorAll('.menu-item')[1].classList.add('active');
 }
+
+// ========================
+// DATA (DEEPLINKS)
+// ========================
+const deeplinks = [
+  { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
+  { title: "WebView", android: "petz://webview/<url_produto_web>", ios: "petz://webview/https://www.petz.com.br/produto/areia-higienica-fresh-micro-silica-cristal-para-gatos-1-6-kg-181825" },
+  { title: "Coleção / Categoria", android: "petz://colecao/EG-selecao-marca-propria-petz", ios: "petz://colecao/EG-selecao-marca-propria-petz&action_type=3" },
+  { title: "Assinatura / Edição", android: "petz://pag_assinaturas", ios: "petz://pag_assinaturas&action_type=4" },
+  { title: "Lojas", android: "petz://pag_lojas", ios: "petz://pag_lojas&action_type=5" },
+  { title: "Ofertas", android: "petz://minhas_ofertas", ios: "petz://minhas_ofertas&action_type=6" },
+  { title: "Banho & Tosa", android: "petz://banho_tosa", ios: "petz://banho_tosa&action_type=7" },
+  { title: "Meus Pets", android: "petz://meus_pets", ios: "petz://meus_pets" },
+  { title: "Seres", android: "petz://seres", ios: "petz://seres" },
+  { title: "Feed Petz", android: "petz://feed_petz", ios: "petz://feed_petz" },
+  { title: "Carteira", android: "petz://carteira", ios: "petz://carteira&action_type=11" },
+  { title: "Blog Petz", android: "blog_petz", ios: "petz://webview/https://www.petz.com.br/blog/" },
+  { title: "Home Clubz", android: "clubz_home", ios: "petz://clubz_home" },
+  { title: "Cupons", android: "cupons", ios: "petz://cupons" },
+  { title: "Plano de Saúde", android: "petz://healthcare", ios: "petz://healthcare" },
+  { title: "Home", android: "petz://home", ios: "petz://home" }
+];
+
+// ========================
+// RENDER
+// ========================
+const grid = document.getElementById("grid");
+
+function render(list) {
+  grid.innerHTML = "";
+
+  list.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <div class="title">${item.title}</div>
+      <div class="buttons">
+        <a class="btn android" href="${item.android}">Android</a>
+        <a class="btn ios" href="${item.ios}">iOS</a>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+// inicial
+render(deeplinks);
+
+// ========================
+// SEARCH
+// ========================
+document.getElementById("search").addEventListener("input", function () {
+  const value = this.value.toLowerCase();
+
+  const filtered = deeplinks.filter(item =>
+    item.title.toLowerCase().includes(value) ||
+    item.android.toLowerCase().includes(value) ||
+    item.ios.toLowerCase().includes(value)
+  );
+
+  render(filtered);
+});
 </script>
 
 </body>
