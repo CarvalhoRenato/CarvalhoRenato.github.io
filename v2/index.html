@@ -19,6 +19,7 @@ body {
   margin: 0 auto;
 }
 
+/* MENU */
 .menu {
   display: flex;
   gap: 10px;
@@ -44,6 +45,7 @@ body {
   font-weight: 600;
 }
 
+/* INPUT */
 .search input {
   width: 100%;
   padding: 14px;
@@ -51,12 +53,14 @@ body {
   border: 1px solid #E2E8F0;
 }
 
+/* GRID */
 .grid {
   display: grid;
   gap: 16px;
   margin-top: 20px;
 }
 
+/* CARD */
 .card {
   background: #FFFFFF;
   padding: 18px;
@@ -68,6 +72,7 @@ body {
   font-weight: 600;
 }
 
+/* BUTTONS */
 .buttons {
   display: flex;
   gap: 10px;
@@ -124,7 +129,6 @@ body {
 }
 
 .status-ok { color: #16A34A; }
-.status-warn { color: #D97706; }
 .status-bad { color: #DC2626; }
 </style>
 </head>
@@ -135,14 +139,39 @@ body {
 
   <!-- MENU -->
   <div class="menu">
-    <button class="menu-item active" onclick="showPage('deeplinks')">Deeplinks</button>
+    <button class="menu-item active" onclick="showPage('home')">Home</button>
+    <button class="menu-item" onclick="showPage('deeplinks')">Deeplinks</button>
     <button class="menu-item" onclick="showPage('health')">
       Health <span id="health-badge" class="badge"></span>
     </button>
   </div>
 
+  <!-- HOME -->
+  <div id="home-page">
+    <h1>QA Portal 🧪</h1>
+    <p style="color:#64748B; margin-top:-10px;">
+      Central de ferramentas para testes e validação de ambientes
+    </p>
+
+    <div class="grid">
+      <div class="card" onclick="showPage('deeplinks')" style="cursor:pointer;">
+        <div class="title">🔗 Deeplinks</div>
+        <div style="margin-top:6px; color:#64748B;">
+          Acesso rápido para fluxos do app
+        </div>
+      </div>
+
+      <div class="card" onclick="showPage('health')" style="cursor:pointer;">
+        <div class="title">🚦 Health Check</div>
+        <div style="margin-top:6px; color:#64748B;">
+          Status dos ambientes e serviços
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- DEEPLINKS -->
-  <div id="deeplinks-page">
+  <div id="deeplinks-page" style="display:none;">
     <h1>Deeplinks</h1>
 
     <div class="search">
@@ -165,6 +194,9 @@ body {
 // NAV
 // ========================
 function showPage(page) {
+  document.getElementById('home-page').style.display =
+    page === 'home' ? 'block' : 'none';
+
   document.getElementById('deeplinks-page').style.display =
     page === 'deeplinks' ? 'block' : 'none';
 
@@ -173,16 +205,17 @@ function showPage(page) {
 
   document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
 
-  if (page === 'deeplinks') document.querySelectorAll('.menu-item')[0].classList.add('active');
+  if (page === 'home') document.querySelectorAll('.menu-item')[0].classList.add('active');
+  if (page === 'deeplinks') document.querySelectorAll('.menu-item')[1].classList.add('active');
 
   if (page === 'health') {
-    document.querySelectorAll('.menu-item')[1].classList.add('active');
+    document.querySelectorAll('.menu-item')[2].classList.add('active');
     loadHealth();
   }
 }
 
 // ========================
-// DEEPLINKS (COMPLETO - NÃO ALTERAR)
+// DEEPLINKS (COMPLETO)
 // ========================
 const deeplinks = [
   { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
@@ -232,7 +265,7 @@ document.getElementById("search").addEventListener("input", function () {
 });
 
 // ========================
-// HEALTH (ESTÁVEL)
+// HEALTH
 // ========================
 const environments = [
   {
@@ -334,7 +367,7 @@ async function loadHealth() {
     title.appendChild(badgeEnv);
   }
 
-  // badge menu
+  // BADGE MENU
   if (globalFailed === 0) badge.innerText = "🟢";
   else if (globalFailed < globalTotal) badge.innerText = "🟡";
   else badge.innerText = "🔴";
