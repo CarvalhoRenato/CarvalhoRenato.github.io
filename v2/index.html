@@ -19,9 +19,7 @@ body {
   margin: 0 auto;
 }
 
-/* ========================
-   MENU
-======================== */
+/* MENU */
 .menu {
   display: flex;
   gap: 10px;
@@ -42,20 +40,13 @@ body {
   color: #0369A1;
 }
 
-.badge {
-  margin-left: 6px;
-}
-
-/* ========================
-   SEARCH
-======================== */
+/* SEARCH */
 .search {
   position: relative;
 }
 
 .search input {
   width: 100%;
-  box-sizing: border-box;
   padding: 14px 14px 14px 38px;
   border-radius: 14px;
   border: 1px solid #E2E8F0;
@@ -67,21 +58,16 @@ body {
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #94A3B8;
 }
 
-/* ========================
-   GRID
-======================== */
+/* GRID */
 .grid {
   display: grid;
   gap: 16px;
   margin-top: 20px;
 }
 
-/* ========================
-   CARD
-======================== */
+/* CARD */
 .card {
   background: #FFFFFF;
   padding: 18px;
@@ -93,9 +79,7 @@ body {
   font-weight: 600;
 }
 
-/* ========================
-   BUTTONS
-======================== */
+/* BUTTONS */
 .buttons {
   display: flex;
   gap: 10px;
@@ -108,7 +92,6 @@ body {
   border-radius: 12px;
   text-align: center;
   text-decoration: none;
-  font-weight: 500;
 }
 
 .android {
@@ -121,22 +104,18 @@ body {
   color: #334155;
 }
 
-/* ========================
-   REPORT BUTTON (MELHORADO)
-======================== */
+/* REPORT */
 .report-btn {
   font-size: 12px;
   padding: 6px 12px;
   border-radius: 10px;
-  border: 1px solid #FECACA;
+  border: 1px solid #FCA5A5;
   background: #FEF2F2;
   color: #B91C1C;
   cursor: pointer;
 }
 
-/* ========================
-   HEALTH
-======================== */
+/* HEALTH */
 .toggle {
   display: flex;
   justify-content: space-between;
@@ -145,28 +124,21 @@ body {
 
 .header-left {
   display: flex;
-  align-items: center;
   gap: 8px;
 }
 
 .header-right {
   display: flex;
+  gap: 16px;
   align-items: center;
-  gap: 16px; /* 🔥 separação maior */
 }
 
 .arrow {
   cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.arrow.open {
-  transform: rotate(90deg);
 }
 
 .services {
   display: none;
-  margin-top: 10px;
 }
 
 .services.open {
@@ -179,9 +151,7 @@ body {
   margin-top: 8px;
 }
 
-/* ========================
-   WATERMARK
-======================== */
+/* WATERMARK */
 .watermark {
   position: fixed;
   bottom: 10px;
@@ -197,52 +167,39 @@ body {
 
 <div class="container">
 
-  <div class="menu">
-    <button class="menu-item active" onclick="showPage('home')">Home</button>
-    <button class="menu-item" onclick="showPage('deeplinks')">Deeplinks</button>
-    <button class="menu-item" onclick="showPage('health')">
-      Health <span id="health-badge" class="badge"></span>
-    </button>
-  </div>
+<div class="menu">
+<button class="menu-item active" onclick="showPage('home')">Home</button>
+<button class="menu-item" onclick="showPage('deeplinks')">Deeplinks</button>
+<button class="menu-item" onclick="showPage('health')">Health</button>
+</div>
 
-  <div id="home-page">
-    <h1>QA Portal 🧪</h1>
-    <p style="color:#64748B;">
-      Central de testes e validação de ambientes
-    </p>
+<div id="home-page">
+<h1>QA Portal 🧪</h1>
+<div class="grid">
+<div class="card">
+<div class="title">🔗 Deeplinks</div>
+<button class="btn ios" onclick="showPage('deeplinks')">Acessar</button>
+</div>
+<div class="card">
+<div class="title">🚦 Health</div>
+<button class="btn android" onclick="showPage('health')">Ver status</button>
+</div>
+</div>
+</div>
 
-    <div class="grid">
-      <div class="card">
-        <div class="title">🔗 Deeplinks</div>
-        <div class="buttons">
-          <button class="btn ios" onclick="showPage('deeplinks')">Acessar</button>
-        </div>
-      </div>
+<div id="deeplinks-page" style="display:none;">
+<h1>Deeplinks</h1>
+<div class="search">
+<span class="search-icon">🔍</span>
+<input id="search" placeholder="Buscar..." />
+</div>
+<div class="grid" id="grid"></div>
+</div>
 
-      <div class="card">
-        <div class="title">🚦 Health</div>
-        <div class="buttons">
-          <button class="btn android" onclick="showPage('health')">Ver status</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="deeplinks-page" style="display:none;">
-    <h1>Deeplinks</h1>
-
-    <div class="search">
-      <span class="search-icon">🔍</span>
-      <input id="search" placeholder="Buscar..." />
-    </div>
-
-    <div class="grid" id="grid"></div>
-  </div>
-
-  <div id="health-page" style="display:none;">
-    <h1>Health 🚦</h1>
-    <div class="grid" id="health-grid"></div>
-  </div>
+<div id="health-page" style="display:none;">
+<h1>Health 🚦</h1>
+<div class="grid" id="health-grid"></div>
+</div>
 
 </div>
 
@@ -255,88 +212,57 @@ function showPage(page) {
   document.getElementById('home-page').style.display = page === 'home' ? 'block' : 'none';
   document.getElementById('deeplinks-page').style.display = page === 'deeplinks' ? 'block' : 'none';
   document.getElementById('health-page').style.display = page === 'health' ? 'block' : 'none';
-
-  document.querySelectorAll('.menu-item').forEach(b => b.classList.remove('active'));
-
-  if (page === 'home') document.querySelectorAll('.menu-item')[0].classList.add('active');
-  if (page === 'deeplinks') document.querySelectorAll('.menu-item')[1].classList.add('active');
-
-  if (page === 'health') {
-    document.querySelectorAll('.menu-item')[2].classList.add('active');
-    loadHealth();
-  }
 }
 
-// HEALTH
-const environments = [
-  {
-    name: "PRD",
-    services: [
-      { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" },
-      { name: "Fake OK", url: "https://www.petz.com.br/home/api/readiness" },
-      { name: "Fake FAIL", url: "https://fake-url/test" }
-    ]
-  }
+// ========================
+// DEEPLINKS (NÃO ALTERAR)
+// ========================
+const deeplinks = [
+  { title: "Produto", android: "#", ios: "#" },
+  { title: "WebView", android: "#", ios: "#" },
+  { title: "Coleção", android: "#", ios: "#" },
+  { title: "Assinatura", android: "#", ios: "#" }
 ];
 
-async function loadHealth() {
-
-  const grid = document.getElementById("health-grid");
-
+function render(list) {
+  const grid = document.getElementById("grid");
   grid.innerHTML = "";
+  list.forEach(item => {
+    grid.innerHTML += `
+      <div class="card">
+        <div class="title">${item.title}</div>
+        <div class="buttons">
+          <a class="btn android">Android</a>
+          <a class="btn ios">iOS</a>
+        </div>
+      </div>
+    `;
+  });
+}
 
-  for (const env of environments) {
+render(deeplinks);
 
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const header = document.createElement("div");
-    header.className = "toggle";
-
-    const left = document.createElement("div");
-    left.className = "header-left";
-
-    const right = document.createElement("div");
-    right.className = "header-right";
-
-    const title = document.createElement("div");
-    title.className = "title";
-    title.innerText = env.name;
-
-    const arrow = document.createElement("div");
-    arrow.className = "arrow";
-    arrow.innerText = "▶";
-
-    const reportBtn = document.createElement("button");
-    reportBtn.className = "report-btn";
-    reportBtn.innerText = "Reportar";
-
-    left.appendChild(title);
-    right.appendChild(reportBtn);
-    right.appendChild(arrow);
-
-    header.appendChild(left);
-    header.appendChild(right);
-
-    const servicesContainer = document.createElement("div");
-    servicesContainer.className = "services";
-
-    card.appendChild(header);
-    card.appendChild(servicesContainer);
-    grid.appendChild(card);
-
-    arrow.onclick = () => {
-      servicesContainer.classList.toggle("open");
-      arrow.classList.toggle("open");
-    };
-
-    for (const service of env.services) {
-      const el = document.createElement("div");
-      el.className = "service";
-      el.innerHTML = `<span>${service.name}</span><span>🟢</span>`;
-      servicesContainer.appendChild(el);
-    }
-  }
+// ========================
+// HEALTH
+// ========================
+function loadHealth() {
+  const grid = document.getElementById("health-grid");
+  grid.innerHTML = `
+    <div class="card">
+      <div class="toggle">
+        <div class="header-left">PRD 🟡</div>
+        <div class="header-right">
+          <button class="report-btn">Reportar</button>
+          <div class="arrow">▶</div>
+        </div>
+      </div>
+      <div class="services open">
+        <div class="service">Home API <span>🟢</span></div>
+        <div class="service">Fake OK <span>🟢</span></div>
+        <div class="service">Fake FAIL <span>⚠️</span></div>
+      </div>
+    </div>
+  `;
 }
 
 </script>
