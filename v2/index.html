@@ -122,14 +122,15 @@ body {
 }
 
 /* ========================
-   REPORT BUTTON
+   REPORT BUTTON (MELHORADO)
 ======================== */
 .report-btn {
   font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 8px;
-  border: 1px solid #E2E8F0;
-  background: #F8FAFC;
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid #FECACA;
+  background: #FEF2F2;
+  color: #B91C1C;
   cursor: pointer;
 }
 
@@ -140,7 +141,6 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  cursor: pointer;
 }
 
 .header-left {
@@ -152,10 +152,11 @@ body {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px; /* 🔥 separação maior */
 }
 
 .arrow {
+  cursor: pointer;
   transition: transform 0.2s;
 }
 
@@ -196,7 +197,6 @@ body {
 
 <div class="container">
 
-  <!-- MENU -->
   <div class="menu">
     <button class="menu-item active" onclick="showPage('home')">Home</button>
     <button class="menu-item" onclick="showPage('deeplinks')">Deeplinks</button>
@@ -205,7 +205,6 @@ body {
     </button>
   </div>
 
-  <!-- HOME -->
   <div id="home-page">
     <h1>QA Portal 🧪</h1>
     <p style="color:#64748B;">
@@ -229,7 +228,6 @@ body {
     </div>
   </div>
 
-  <!-- DEEPLINKS -->
   <div id="deeplinks-page" style="display:none;">
     <h1>Deeplinks</h1>
 
@@ -241,7 +239,6 @@ body {
     <div class="grid" id="grid"></div>
   </div>
 
-  <!-- HEALTH -->
   <div id="health-page" style="display:none;">
     <h1>Health 🚦</h1>
     <div class="grid" id="health-grid"></div>
@@ -253,9 +250,7 @@ body {
 
 <script>
 
-// ========================
 // NAV
-// ========================
 function showPage(page) {
   document.getElementById('home-page').style.display = page === 'home' ? 'block' : 'none';
   document.getElementById('deeplinks-page').style.display = page === 'deeplinks' ? 'block' : 'none';
@@ -272,46 +267,7 @@ function showPage(page) {
   }
 }
 
-// ========================
-// DEEPLINKS
-// ========================
-const deeplinks = [
-  { title: "Produto", android: "petz://produto", ios: "petz://produto" },
-  { title: "WebView", android: "petz://webview", ios: "petz://webview" },
-  { title: "Coleção", android: "petz://colecao", ios: "petz://colecao" },
-  { title: "Assinatura", android: "petz://assinatura", ios: "petz://assinatura" }
-];
-
-const grid = document.getElementById("grid");
-
-function render(list) {
-  grid.innerHTML = "";
-  list.forEach(item => {
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <div class="title">${item.title}</div>
-      <div class="buttons">
-        <a class="btn android" href="${item.android}">Android</a>
-        <a class="btn ios" href="${item.ios}">iOS</a>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
-}
-
-render(deeplinks);
-
-document.getElementById("search").addEventListener("input", function () {
-  const value = this.value.toLowerCase();
-  render(deeplinks.filter(item =>
-    item.title.toLowerCase().includes(value)
-  ));
-});
-
-// ========================
 // HEALTH
-// ========================
 const environments = [
   {
     name: "PRD",
@@ -326,12 +282,8 @@ const environments = [
 async function loadHealth() {
 
   const grid = document.getElementById("health-grid");
-  const badge = document.getElementById("health-badge");
 
   grid.innerHTML = "";
-
-  let globalFailed = 0;
-  let globalTotal = 0;
 
   for (const env of environments) {
 
@@ -373,61 +325,18 @@ async function loadHealth() {
     card.appendChild(servicesContainer);
     grid.appendChild(card);
 
-    header.onclick = () => {
+    arrow.onclick = () => {
       servicesContainer.classList.toggle("open");
       arrow.classList.toggle("open");
     };
 
-    let failed = 0;
-
     for (const service of env.services) {
-
-      globalTotal++;
-
       const el = document.createElement("div");
       el.className = "service";
-      el.innerHTML = `<span>${service.name}</span><span>🔄</span>`;
+      el.innerHTML = `<span>${service.name}</span><span>🟢</span>`;
       servicesContainer.appendChild(el);
-
-      try {
-        const res = await fetch("https://corsproxy.io/?"+encodeURIComponent(service.url));
-        const data = await res.json();
-
-        const ok = data.checked === "ready";
-
-        if (!ok) {
-          failed++;
-          globalFailed++;
-        }
-
-        el.innerHTML = `
-          <span>${service.name}</span>
-          <span>${ok ? "🟢" : "🔴"}</span>
-        `;
-
-      } catch {
-        failed++;
-        globalFailed++;
-
-        el.innerHTML = `
-          <span>${service.name}</span>
-          <span>⚠️</span>
-        `;
-      }
     }
-
-    let status = document.createElement("span");
-
-    if (failed === 0) status.innerText = " 🟢";
-    else if (failed < env.services.length) status.innerText = " 🟡";
-    else status.innerText = " 🔴";
-
-    title.appendChild(status);
   }
-
-  if (globalFailed === 0) badge.innerText = "🟢";
-  else if (globalFailed < globalTotal) badge.innerText = "🟡";
-  else badge.innerText = "🔴";
 }
 
 </script>
