@@ -45,14 +45,9 @@ body {
   font-weight: 600;
 }
 
-/* SEARCH FIX */
-.search {
-  margin-top: 10px;
-}
-
+/* SEARCH */
 .search input {
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
   padding: 14px;
   border-radius: 14px;
@@ -106,9 +101,9 @@ body {
 
 /* HEALTH */
 .toggle {
-  cursor: pointer;
   display: flex;
   justify-content: space-between;
+  cursor: pointer;
 }
 
 .arrow {
@@ -134,19 +129,14 @@ body {
   margin-top: 8px;
 }
 
-.status-ok { color: #16A34A; }
-.status-bad { color: #DC2626; }
-
 /* WATERMARK */
 .watermark {
   position: fixed;
   bottom: 10px;
-  left: 0;
   width: 100%;
   text-align: center;
   font-size: 12px;
   color: #94A3B8;
-  pointer-events: none;
 }
 </style>
 </head>
@@ -167,25 +157,9 @@ body {
   <!-- HOME -->
   <div id="home-page">
     <h1>QA Portal 🧪</h1>
-    <p style="color:#64748B; margin-top:-10px;">
-      Central de ferramentas para testes e validação de ambientes
+    <p style="color:#64748B;">
+      Central de testes e validação de ambientes
     </p>
-
-    <div class="grid">
-      <div class="card" onclick="showPage('deeplinks')" style="cursor:pointer;">
-        <div class="title">🔗 Deeplinks</div>
-        <div style="margin-top:6px; color:#64748B;">
-          Acesso rápido para fluxos do app
-        </div>
-      </div>
-
-      <div class="card" onclick="showPage('health')" style="cursor:pointer;">
-        <div class="title">🚦 Health Check</div>
-        <div style="margin-top:6px; color:#64748B;">
-          Status dos ambientes e serviços
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- DEEPLINKS -->
@@ -207,14 +181,9 @@ body {
 
 </div>
 
-<!-- WATERMARK -->
-<div class="watermark">
-  Desenvolvido por Chapter QA
-</div>
+<div class="watermark">Desenvolvido por Chapter QA</div>
 
 <script>
-let healthInterval = null;
-
 // NAV
 function showPage(page) {
 
@@ -232,23 +201,14 @@ function showPage(page) {
   if (page === 'home') document.querySelectorAll('.menu-item')[0].classList.add('active');
   if (page === 'deeplinks') document.querySelectorAll('.menu-item')[1].classList.add('active');
 
-  if (healthInterval) {
-    clearInterval(healthInterval);
-    healthInterval = null;
-  }
-
   if (page === 'health') {
     document.querySelectorAll('.menu-item')[2].classList.add('active');
-
     loadHealth();
-
-    // 🔄 AUTO REFRESH
-    healthInterval = setInterval(loadHealth, 30000);
   }
 }
 
 // ========================
-// DEEPLINKS (NÃO ALTERAR)
+// DEEPLINKS (COMPLETO)
 // ========================
 const deeplinks = [
   { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
@@ -298,18 +258,21 @@ document.getElementById("search").addEventListener("input", function () {
 });
 
 // ========================
-// HEALTH
+// HEALTH (EXPANSÍVEL RESTAURADO)
 // ========================
 const environments = [
   {
     name: "PRD",
     services: [
-      { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" }
+      { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" },
+      { name: "Fake API 1", url: "https://fake-url/test1" },
+      { name: "Fake API 2", url: "https://fake-url/test2" }
     ]
   }
 ];
 
 async function loadHealth() {
+
   const grid = document.getElementById("health-grid");
   const badge = document.getElementById("health-badge");
 
@@ -323,39 +286,80 @@ async function loadHealth() {
     const card = document.createElement("div");
     card.className = "card";
 
+    const header = document.createElement("div");
+    header.className = "toggle";
+
     const title = document.createElement("div");
     title.className = "title";
     title.innerText = env.name;
 
-    card.appendChild(title);
+    const arrow = document.createElement("div");
+    arrow.className = "arrow";
+    arrow.innerText = "▶";
+
+    header.appendChild(title);
+    header.appendChild(arrow);
+
+    const servicesContainer = document.createElement("div");
+    servicesContainer.className = "services";
+
+    card.appendChild(header);
+    card.appendChild(servicesContainer);
     grid.appendChild(card);
+
+    header.onclick = () => {
+      servicesContainer.classList.toggle("open");
+      arrow.classList.toggle("open");
+    };
+
+    let failed = 0;
 
     for (const service of env.services) {
 
       globalTotal++;
 
+      const el = document.createElement("div");
+      el.className = "service";
+      el.innerHTML = `<span>${service.name}</span><span>🔄</span>`;
+      servicesContainer.appendChild(el);
+
       try {
         const res = await fetch("https://corsproxy.io/?"+encodeURIComponent(service.url));
         const data = await res.json();
 
-        const isReady = data.checked === "ready";
+        const ok = data.checked === "ready";
 
-        if (!isReady) globalFailed++;
+        if (!ok) {
+          failed++;
+          globalFailed++;
+        }
 
-        const status = document.createElement("div");
-        status.innerHTML = `${service.name}: ${isReady ? "🟢" : "🔴"}`;
-        card.appendChild(status);
+        el.innerHTML = `
+          <span>${service.name}</span>
+          <span>${ok ? "🟢" : "🔴"}</span>
+        `;
 
       } catch {
+        failed++;
         globalFailed++;
 
-        const status = document.createElement("div");
-        status.innerHTML = `${service.name}: ⚠️`;
-        card.appendChild(status);
+        el.innerHTML = `
+          <span>${service.name}</span>
+          <span>⚠️</span>
+        `;
       }
     }
+
+    let envStatus = document.createElement("span");
+
+    if (failed === 0) envStatus.innerText = " 🟢";
+    else if (failed < env.services.length) envStatus.innerText = " 🟡";
+    else envStatus.innerText = " 🔴";
+
+    title.appendChild(envStatus);
   }
 
+  // BADGE
   if (globalFailed === 0) badge.innerText = "🟢";
   else if (globalFailed < globalTotal) badge.innerText = "🟡";
   else badge.innerText = "🔴";
