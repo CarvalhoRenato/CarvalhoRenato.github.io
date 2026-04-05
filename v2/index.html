@@ -119,6 +119,24 @@
     <div class="card"><div class="title">Home</div><div class="buttons"><a class="btn android" href="petz://home">Android</a><a class="btn ios" href="petz://home">iOS</a></div></div>
 
   </div>
+  
+<script>
+  const searchInput = document.getElementById('search');
+  const cards = document.querySelectorAll('.card');
 
+  searchInput.addEventListener('input', function () {
+    const value = this.value.toLowerCase();
+
+    cards.forEach(card => {
+      const title = card.querySelector('.title').textContent.toLowerCase();
+
+      if (title.includes(value)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+</script>
 </body>
 </html>
