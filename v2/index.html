@@ -44,7 +44,7 @@ body {
   margin-left: 6px;
 }
 
-/* SEARCH (🔥 AJUSTADO) */
+/* SEARCH (AJUSTADO) */
 .search {
   position: relative;
 }
@@ -58,14 +58,12 @@ body {
   font-size: 16px; /* 🔥 evita zoom no iOS */
 }
 
-/* 🔍 ícone */
 .search-icon {
   position: absolute;
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: #94A3B8;
-  font-size: 16px;
 }
 
 /* GRID */
@@ -217,7 +215,7 @@ body {
 <div class="watermark">Desenvolvido por Chapter QA</div>
 
 <script>
-// NAV (inalterado)
+// NAV
 function showPage(page) {
   document.getElementById('home-page').style.display = page === 'home' ? 'block' : 'none';
   document.getElementById('deeplinks-page').style.display = page === 'deeplinks' ? 'block' : 'none';
@@ -234,4 +232,150 @@ function showPage(page) {
   }
 }
 
-// RESTANTE DO JS (100% INTACTO)
+// ========================
+// DEEPLINKS
+// ========================
+const deeplinks = [
+  { title: "Produto", android: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767", ios: "petz://produto/tapete-higienico-petz-para-caes-superabsorvente-149767&action_type=2" },
+  { title: "WebView", android: "petz://webview/<url_produto_web>", ios: "petz://webview/https://www.petz.com.br/produto/areia-higienica-fresh-micro-silica-cristal-para-gatos-1-6-kg-181825" },
+  { title: "Coleção / Categoria", android: "petz://colecao/EG-selecao-marca-propria-petz", ios: "petz://colecao/EG-selecao-marca-propria-petz&action_type=3" },
+  { title: "Assinatura / Edição", android: "petz://pag_assinaturas", ios: "petz://pag_assinaturas&action_type=4" }
+];
+
+const grid = document.getElementById("grid");
+
+function render(list) {
+  grid.innerHTML = "";
+  list.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="title">${item.title}</div>
+      <div class="buttons">
+        <a class="btn android" href="${item.android}">Android</a>
+        <a class="btn ios" href="${item.ios}">iOS</a>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+render(deeplinks);
+
+document.getElementById("search").addEventListener("input", function () {
+  const value = this.value.toLowerCase();
+  render(deeplinks.filter(item =>
+    item.title.toLowerCase().includes(value)
+  ));
+});
+
+// ========================
+// HEALTH
+// ========================
+const environments = [
+  {
+    name: "PRD",
+    services: [
+      { name: "Home API", url: "https://www.petz.com.br/home/api/readiness" },
+      { name: "Fake OK", url: "https://www.petz.com.br/home/api/readiness" },
+      { name: "Fake FAIL", url: "https://fake-url/test" }
+    ]
+  }
+];
+
+async function loadHealth() {
+
+  const grid = document.getElementById("health-grid");
+  const badge = document.getElementById("health-badge");
+
+  grid.innerHTML = "";
+
+  let globalFailed = 0;
+  let globalTotal = 0;
+
+  for (const env of environments) {
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const header = document.createElement("div");
+    header.className = "toggle";
+
+    const title = document.createElement("div");
+    title.className = "title";
+    title.innerText = env.name;
+
+    const arrow = document.createElement("div");
+    arrow.className = "arrow";
+    arrow.innerText = "▶";
+
+    header.appendChild(title);
+    header.appendChild(arrow);
+
+    const servicesContainer = document.createElement("div");
+    servicesContainer.className = "services";
+
+    card.appendChild(header);
+    card.appendChild(servicesContainer);
+    grid.appendChild(card);
+
+    header.onclick = () => {
+      servicesContainer.classList.toggle("open");
+      arrow.classList.toggle("open");
+    };
+
+    let failed = 0;
+
+    for (const service of env.services) {
+
+      globalTotal++;
+
+      const el = document.createElement("div");
+      el.className = "service";
+      el.innerHTML = `<span>${service.name}</span><span>🔄</span>`;
+      servicesContainer.appendChild(el);
+
+      try {
+        const res = await fetch("https://corsproxy.io/?"+encodeURIComponent(service.url));
+        const data = await res.json();
+
+        const ok = data.checked === "ready";
+
+        if (!ok) {
+          failed++;
+          globalFailed++;
+        }
+
+        el.innerHTML = `
+          <span>${service.name}</span>
+          <span>${ok ? "🟢" : "🔴"}</span>
+        `;
+
+      } catch {
+        failed++;
+        globalFailed++;
+
+        el.innerHTML = `
+          <span>${service.name}</span>
+          <span>⚠️</span>
+        `;
+      }
+    }
+
+    let status = document.createElement("span");
+
+    if (failed === 0) status.innerText = " 🟢";
+    else if (failed < env.services.length) status.innerText = " 🟡";
+    else status.innerText = " 🔴";
+
+    title.appendChild(status);
+  }
+
+  if (globalFailed === 0) badge.innerText = "🟢";
+  else if (globalFailed < globalTotal) badge.innerText = "🟡";
+  else badge.innerText = "🔴";
+}
+</script>
+
+</body>
+</html>
